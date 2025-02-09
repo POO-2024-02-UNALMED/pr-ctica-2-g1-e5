@@ -159,3 +159,17 @@ class Aerolinea():
 
     def setVuelos(self, vuelos):
         self._vuelos = vuelos
+
+    def getAeronaves(self):
+        return self._aeronaves
+
+    def setAviones(self, aviones):
+        self._aeronaves = aviones
+
+    @staticmethod
+    def getAerolineas():
+        return Aerolinea._aerolineas
+
+    @staticmethod
+    def setAerolineas(aerolineas):
+        Aerolinea._aerolineas = aerolineas
