@@ -159,3 +159,15 @@ class Aeronave(ABC):
             for numPosicion in range(0, Avioneta.getNumSillasEconomicas()):
                 if numPosicion % 6 == 0 or numPosicion% 6 == 5:
                     ubicacion = Ubicacion.VENTANA
+                elif numPosicion % 6 == 1 or numPosicion % 6 == 4:
+                        ubicacion = Ubicacion.CENTRAL
+                elif numPosicion % 6 == 2 or numPosicion % 6 == 3:
+                    ubicacion = Ubicacion.PASILLO
+                aeronave.getSILLASECONOMICAS().append(Silla(Clase.ECONOMICA, numPosicion, ubicacion))
+
+
+    #	METODO ABSTRACTO: ESTE METODO RECIBE UN TIPO DE DATO DOUBLE DE LA DISTANCIA QUE HAY DESDE EL LUGAR DE ORIGEN AL LUGAR DE DESTINO
+    #	Y RETONARNA EL COSTO TOTAL DE GASOLINA PARA RECORRER EL TRAYECTO
+    @abstractmethod
+    def Calcular_Consumo_Gasolina(self, distancia_en_km):
+        pass
