@@ -62,7 +62,6 @@ class Admin(object):
             tiquete = Tiquete(int(ID_tiquete), vuelo.getPrecio(), vuelo)
         return tiquete
 
-
     #--------------------------------------------------------------------------------------------------------------------------------------
     # CREA UN PASAJERO Y SE LO ASIGNA AL TIQUETE, POSTERIORMENTE SE LE ASIGNA EL PRECIO AL TIQUETE
     @staticmethod
@@ -287,7 +286,6 @@ class Admin(object):
         picklefile2.close()
         quit()
 
-
     #--------------------------------------------------------------------------------------------------------------------------------------
     # ESTE METODO RECIBE COMO PARAMETRO UN DESTINO (STRING) Y UN FRAME. RECORRE CADA AEROLINEA EJECUTANDO EL METODO DE AEROLINEA buscarVueloPorDestino()
     # PARA ALMACENAR ESTOS VUELOS EN UNA LISTA Y EJECUTAR EL METODO mostrarTablaDeVuelos, DONDE SE LLENARA UN LABEL CON ESTA INFO.
@@ -316,7 +314,6 @@ class Admin(object):
         lista_vuelos_nombres.append(nombreAerolineas)
 
         return lista_vuelos_nombres
-
 
     #--------------------------------------------------------------------------------------------------------------------------------------
     # ESTE METODO RECIBE COMO PARAMETRO UN DESTINO (STRING), UNA FECHA (STRING) Y UN FRAME. RECORRE CADA AEROLINEA EJECUTANDO EL METODO DE
@@ -349,8 +346,6 @@ class Admin(object):
         lista_vuelos_nombres.append(nombreAerolineas)
 
         return lista_vuelos_nombres
-
-
     #--------------------------------------------------------------------------------------------------------------------------------------
     # RECIBE UN TIQUETE Y LOS DATOS DE UNA SILLA, PARA RETORNAR LA SILLA CON ESTAS CARACTERISTICAS
     @staticmethod
