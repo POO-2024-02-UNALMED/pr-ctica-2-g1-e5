@@ -346,3 +346,113 @@ class Admin(object):
             i += 1
 
         lista_vuelos_nombres.append(vuelos)
+          lista_vuelos_nombres.append(nombreAerolineas)
+
+        return lista_vuelos_nombres
+
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # RECIBE UN TIQUETE Y LOS DATOS DE UNA SILLA, PARA RETORNAR LA SILLA CON ESTAS CARACTERISTICAS
+    @staticmethod
+    def elegirSilla(tiquete,datos_silla):
+        clase =str( datos_silla[0])
+        ubicacion = str(datos_silla[1])
+
+        if ubicacion.lower() == "pasillo":
+            ubicacion = Ubicacion.PASILLO
+        elif ubicacion.lower() == "ventana":
+            ubicacion = Ubicacion.VENTANA
+        else:
+            ubicacion = Ubicacion.CENTRAL
+
+        return tiquete.getVuelo().getAeronave().buscarSillaPorUbicacionyTipo(ubicacion,clase)
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    #CREA LA TABLA DE PASAJEROS DE UN VUELO LLENANDO UN LABEL CON LOS DATOS DE LOS PASAJEROS ASOCIADOS A LOS TIQUETES DE UN VUELO
+    @staticmethod
+    def mostrarTablaDePasajeros(tiquetes,label):
+        label["text"]+="\n---------------------------------------------------------------"
+        label["text"]+="\n"+"{0:>5} {1:>12} {2:>16} {3:>17}".format("ID", "NOMBRE", "PASAPORTE", "EMAIL"+"\n")
+        label["text"]+="---------------------------------------------------------------"
+
+        i = 0
+        while i < len(tiquetes):
+            label["text"]+="\n"+"{0:>5} {1:>13} {2:>12} {3:>26}".format(str(tiquetes[i].getId()), tiquetes[i].getPasajero().nombre, tiquetes[i].getPasajero().getPasaporte(), tiquetes[i].getPasajero().getEmail())
+            i += 1
+        label["text"]+="\n---------------------------------------------------------------"
+        label["text"]+="\n"
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    #CREA LA TABLA DE ALOJAMIENTOS LLENANDO UN LABEL CON LOS DATOS DE CADA ALOJAMIENTO EN LA LISTA QUE SE LE PASO
+    @staticmethod
+    def mostrarTablaDeAlojamientos(alojamientos, label):
+        label["text"]+="\n"
+        label["text"]+="\n"+ "-------------------------------------------------------------"
+        label["text"]+="\n"+"{0:>10} {1:>15} {2:>18} {3:>12}".format("NOMBRE", "LOCACION", "PRECIO POR DIA", "ESTRELLAS")
+        label["text"]+="\n"
+        label["text"]+="\n"+"-------------------------------------------------------------"
+
+        j = 0
+        while j < len(alojamientos):
+            label["text"]+="\n"+"{0:>13} {1:>11} {2:>16} {3:>11}".format(alojamientos[j].getNombre(), alojamientos[j].getLocacion(), alojamientos[j].getPrecio_dia(), alojamientos[j].getEstrellas())
+            label["text"]+="\n"
+            j += 1
+
+        label["text"]+="\n"+"-------------------------------------------------------------"
+        label["text"]+="\n"
+
+    @staticmethod
+    def mostrarTablaDeVuelosDisponiblesPorAerolineas(aerolineas,frame_operaciones):
+        i = 0
+        lista = []
+        while i < len(aerolineas):
+            label = Label(frame_operaciones)
+            aerolinea = aerolineas[i]
+            Admin.printEncabezadoAerolinea(aerolineas[i],label)
+            Admin.printVuelos(aerolinea.vuelosDisponibles(aerolinea.getVuelos()),label)
+            Admin.printSeparador(label)
+            lista.append(label)
+            i += 1
+        return lista
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    #RECIBE UNA AEROLINEA Y SUS VUELOS, Y GENERA UN LABEL CON ESTOS VUELOS HACIENDO USO DE LOS METODOS printEncabezadoAerolinea(), printVuelos() Y printSeparador()
+    @staticmethod
+    def mostrarTablaDeVuelos(aerolinea,vuelos,label):
+        if len(vuelos) != 0:
+            Admin.printEncabezadoAerolinea(aerolinea,label)
+            Admin.printVuelos(vuelos,label)
+            Admin.printSeparador(label)
+        return label
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    #ENCABEZADO CON EL NOMBRE DE LA AEROLINEA Y LOS ATRIBUTOS DE LOS VUELOS QUE POSEE LA AEROLINEA.
+    @staticmethod
+    def printEncabezadoAerolinea(aerolinea,label):
+        label["text"]+="\n"+"VUELOS DISPONIBLES DE LA AEROLINEA " + aerolinea.getNombre().upper()
+        label["text"]+="\n"+"--------------------------------------------------------------------------------------------------"
+        label["text"]+="\n"+"{0:>4} {1:>13} {2:>12} {3:>14} {4:>12} {5:>22} {6:>12}".format("ID", "PRECIO", "ORIGEN", "DESTINO", "FECHA", "HORA DE SALIDA", "AERONAVE")
+        label["text"]+="\n"
+        label["text"]+="\n"+"--------------------------------------------------------------------------------------------------"
+
+    # System.out.printf() PERMITE DARLE UN FORMATO A LOS DATOS DE SALIDA
+    # % INDICA QUE EN ESA POSICION SE VA A ESCRIBIR UN VALOR, SE PUEDEN PONER TANTOS COMO VARIABLES A MOSTRAR
+    # ESTAS VARIABLES SE ESCRIBEN A CONTINUACION DE LAS COMMILLAS Y SEPARADAS POR COMAS
+    # LA s INDICA QUE SE VA A MOSTRAR UNA CADENA DE CARACTERES, Y EL VALOR NUMERICO INDICA LA ALINEACION A LA DERECHA.
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # SE ENCARGA DE RECORRER LOS VUELOS DE UNA AEROLINEA PARA IR AGREGANDO AL LABEL, LINEA POR LINEA, LA INFORMACION PERTINENTE DE CADA UNO.
+    @staticmethod
+    def printVuelos(vuelos,label):
+        j = 0
+        while j < len(vuelos):
+            label["text"]+="\n"+"{0:>5} {1:>12} {2:>13} {3:>13} {4:>15} {5:>11} {6:>21}".format(vuelos[j].getID(), vuelos[j].getPrecio(), vuelos[j].getOrigen(), vuelos[j].getDestino(), vuelos[j].getFecha_de_salida(), vuelos[j].getHora_de_salida(), vuelos[j].getAeronave().getNombre())
+            label["text"]+="\n"
+            j += 1
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    #SEPARADOR PARA LA TABLA DE VUELOS
+    @staticmethod
+    def printSeparador(label):
+        label["text"]+="\n"+"--------------------------------------------------------------------------------------------------"
+        label["text"]+="\n"
