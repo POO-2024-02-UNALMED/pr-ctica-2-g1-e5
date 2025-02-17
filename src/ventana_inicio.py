@@ -121,3 +121,138 @@ class ventana_inicio(Tk):
         if self.contador == 1:
             y1 = self.contador - 1
             y2 = self.contador
+            y3 = self.contador + 1
+            y4 = self.contador + 2
+        elif self.contador == 2:
+            y1 = self.contador + 2
+            y2 = self.contador + 3
+            y3 = self.contador + 4
+            y4 = self.contador + 5
+        elif self.contador == 3:
+            y1 = self.contador + 5
+            y2 = self.contador + 6
+            y3 = self.contador + 7
+            y4 = self.contador + 8
+        elif self.contador == 4:
+            y1 = self.contador + 8
+            y2 = self.contador + 9
+            y3 = self.contador + 10
+            y4 = self.contador + 11
+        elif self.contador == 0:
+            y1 = self.contador -1
+            y2 = self.contador -2 
+            y3 = self.contador -2
+            y4 = self.contador -1
+        elif self.contador == 5:
+            y1 = self.contador + 11
+            y2 = self.contador + 12
+            y3 = self.contador + 13
+            y4 = self.contador + 14
+        imagen_redimensionada1 = Image.open(self.direcciones[y1]).resize((n1, a1), Image.Resampling.LANCZOS)
+        imagen_redimensionada2 = Image.open(self.direcciones[y2]).resize((n2, a2), Image.Resampling.LANCZOS)
+        imagen_redimensionada3 = Image.open(self.direcciones[y3]).resize((n3, a3), Image.Resampling.LANCZOS)
+        imagen_redimensionada4 = Image.open(self.direcciones[y4]).resize((n4, a4), Image.Resampling.LANCZOS)
+        self.nueva_imagen1 = ImageTk.PhotoImage(imagen_redimensionada1)
+        self.nueva_imagen2 = ImageTk.PhotoImage(imagen_redimensionada2)
+        self.nueva_imagen3 = ImageTk.PhotoImage(imagen_redimensionada3)
+        self.nueva_imagen4 = ImageTk.PhotoImage(imagen_redimensionada4)
+        self.im_desa_pos1.config(image=self.nueva_imagen1)
+        self.im_desa_pos2.config(image=self.nueva_imagen2)
+        self.im_desa_pos3.config(image=self.nueva_imagen3)
+        self.im_desa_pos4.config(image=self.nueva_imagen4)
+
+    def actualizar_imagen(self,event=0):
+        nuevo_ancho = self.P4.winfo_width()
+        nuevo_alto = self.P4.winfo_height()
+        imagen_redimensionada = Image.open(self.lineas[self.acumulador]).resize((nuevo_ancho, nuevo_alto), Image.Resampling.LANCZOS)
+        nueva_imagen = ImageTk.PhotoImage(imagen_redimensionada)
+        self.nueva_ventana.config(image=nueva_imagen)
+        self.nueva_ventana.image = nueva_imagen
+        self.actualiza_imagen()
+        
+    #GENERA LA SALIDA DEL TEXTO DE EN LA DESCRIPCION
+    def desno(self):
+        from tkinter import messagebox
+        descripcion = messagebox.showinfo(title = "Informacion", message = "SISTEMA DE RESERVA DE VUELOS",
+        detail = "Nuestra app permite reservar vuelos y alojamientos fácilmente, con herramientas para una gestión eficiente como administrador")
+
+    #GENERA LA SALIDA DE LA VENTANA DE INICIO DANDO CULMINADO EL FUNCIONAMIENTO DE LA APLICACION
+    def salir(self):
+        Admin.salirDelSistema()
+        self.destroy()
+
+    #OCASIONA LA APERTURA DE LA VENTANAPRINCIAL
+    def abrirVentanaSecundaria(self):
+        self.destroy()
+        VentanaSecundaria()
+        #return self.destroy()
+
+    #SUSCITA EL CAMBIO DE INFORMACIÓN DE LA HOJA DE VIDA E IMAGENES DE LOS DESARROLLADORES
+    def cambioHDV(self,b):
+        self.numClicksHDV += 1
+        if self.numClicksHDV == 1:
+            self.varHDV.set("Nombre: Jhoneyker Delgado Urbina \n""Edad : 17 años \n""Programa: Ingeniería de sistemas\n")
+            self.evento()
+        elif self.numClicksHDV == 2:
+            self.varHDV.set("Nombre: Emmanuel Valencia Lopera \n""Edad: 18 años \n" "Programa: Ingeniería de sistemas\n")
+            self.evento()
+        elif self.numClicksHDV == 3:
+            self.varHDV.set("Nombre: Simon Guarin Cortes  \n""Edad : 18 años \n""Programa: Ingeniería de sistemas\n")
+            self.evento()
+        elif self.numClicksHDV == 4:
+            self.varHDV.set("Nombre: Jesus Camilo Miranda Aguirre \n""Edad : 20 años \n""Programa: Ingeniería de sistemas\n")
+            self.evento()
+        elif self.numClicksHDV == 5:
+            self.varHDV.set("Nombre: Andres Jacobo Leal Aguirre \n""Edad : 18 años \n""Programa: Ingeniería de sistemas\n")
+            self.evento()
+            self.numClicksHDV =0
+
+    #PROVOCA LA APERTURA DE LAS IMAGENES DE CADA DESARROLLADOR SEGUN SU IDENTIFICADOR POSICIONAL
+    def evento(self):
+        y1 = 0
+        y2 = 0
+        y3 = 0
+        y4 = 0
+        self.contador += 1
+        if self.contador == 1:
+            y1 = self.contador - 1
+            y2 = self.contador
+            y3 = self.contador + 1
+            y4 = self.contador + 2
+        elif self.contador == 2:
+            y1 = self.contador + 2
+            y2 = self.contador + 3
+            y3 = self.contador + 4
+            y4 = self.contador + 5
+        elif self.contador == 3:
+            y1 = self.contador + 5
+            y2 = self.contador + 6
+            y3 = self.contador + 7
+            y4 = self.contador + 8
+        elif self.contador == 4:
+            y1 = self.contador + 8
+            y2 = self.contador + 9
+            y3 = self.contador + 10
+            y4 = self.contador + 11
+        elif self.contador == 5:
+            y1 = self.contador + 11
+            y2 = self.contador + 12
+            y3 = self.contador + 13
+            y4 = self.contador + 14
+        self.im_desa_pos1.config(image=self.cambio_posiciones[y1])
+        self.im_desa_pos2.config(image=self.cambio_posiciones[y2])
+        self.im_desa_pos3.config(image=self.cambio_posiciones[y3])
+        self.im_desa_pos4.config(image=self.cambio_posiciones[y4])
+        if self.contador>5:
+            self.contador=1
+        self.actualiza_imagen()
+
+    # OCASIONA EL CAMBIO EN LA POSICION DE LAS IMAGENES DEL SISTEMA
+    def cambio(self,a):
+        self.acumulador += 1
+        if self.acumulador == 5:
+            self.acumulador = 0
+        self.nueva_ventana.config(image=self.chang_posiciones[self.acumulador])
+
+if __name__ == "__main__":
+    ventana_inicios = ventana_inicio()
