@@ -172,3 +172,177 @@ class Admin(object):
         if len(tiquetes) == 0:
             label["text"]+="\nEl vuelo aun no tiene pasajeros asociados \n"
         else:
+            Admin.mostrarTablaDePasajeros(tiquetes,label)
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # ESTE METODO RECIBE LA LISTA DE VALORES NECESARIOS PARA LA CREACION DE UN VUELO
+    # PARA ESTO SE HARA UNA VERFICACION DE LA EXISTENCIA DE LA AEROLINEA Y POSTERIORMENTE SE INSTANCIARA UN VUELO SE AREGARA AL ARREGLO DE
+    # VUELOS DE LA AEROLINEA
+
+    @staticmethod
+    def agregarNuevoVuelo(valores):
+        nombreAerolinea = valores[0]
+        iD = int(valores[1])
+        precio= int(valores[2])
+        origen = valores[3]
+        destino = valores[4]
+        distancia = int(valores[5])
+        fechaSalida=valores[6]
+        horaSalida = valores[7]
+        aeronave = valores[8]
+        nombreAeronave = valores[9]
+        for aerolinea in Aerolinea.getAerolineas():
+            existe_vuelo= aerolinea.buscarVueloPorID(aerolinea.getVuelos(),iD)
+            if existe_vuelo !=None:
+                return True
+
+        if aeronave.lower() == "avion":
+            avion = Avion(nombreAeronave, Aerolinea.buscarAerolineaPorNombre(nombreAerolinea))
+            vuelo = Vuelo(iD, precio, origen, destino, avion, distancia, fechaSalida, horaSalida)
+
+        elif aeronave.lower() == "avioneta":
+            avioneta = Avioneta(nombreAeronave, Aerolinea.buscarAerolineaPorNombre(nombreAerolinea))
+            vuelo = Vuelo(iD, precio, origen, destino, avioneta, distancia, fechaSalida, horaSalida)
+        return False
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # RECIBE UN ID QUE PERMITIRA BUSCAR EL VUELO EN TODAS LAS AEROLINEAS, SI ES ENCONTRADO SE ELIMINA Y SE RETORNA TRUE, DE LO CONTRARIO
+    # RETORNA FALSE
+
+    @staticmethod
+    def cancelarVuelos(aero,id):
+        vuelo_encontrado = False
+        aerolineas = Aerolinea.getAerolineas()
+        id = id
+        for aerolinea in aerolineas:
+            i = 0
+            while i < len(aerolinea.getVuelos()):
+                if aerolinea.buscarVueloPorID(aerolinea.getVuelos(), id) != None and aero.getNombre()==aerolinea.getNombre():
+                    aerolinea.cancelarVuelo(id)
+                    vuelo_encontrado = True
+                    break
+                i += 1
+        return vuelo_encontrado
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # SI ENCUENTRA EL NOMBRE DEL AVION QUE SE DESEA RETIRAR RETORNA TRUE, LO MARCA COMO DESCOMPUESTO Y CANCELA EL VUELO QUE TENIA ASOCIADO
+    # ESTA AERONAVE
+
+    @staticmethod
+    def retirarAvion(aero,aeronave):
+        aeronave_encontrada = False
+        nombre_aeronave = aeronave
+        aerolineasDisponibles = Aerolinea.getAerolineas()
+        i = 0
+        while i < len(aerolineasDisponibles):
+            aerolinea = aerolineasDisponibles[i]
+
+            vuelo = aerolinea.buscarVueloPorAeronave(aerolinea.getVuelos(), nombre_aeronave)
+            if vuelo != None and aero.getNombre()==aerolinea.getNombre():
+                vuelo.getAeronave().setDescompuesto(True)
+                aerolinea.cancelarVuelo(vuelo.getID())
+                aeronave_encontrada = True
+                break
+            i += 1
+
+        return aeronave_encontrada
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # PERMITE AGREGAR UN ALOJAMIENTO A LA LISTA DE ALOJAMIENTOS DISPONIBLES, ESTO DESDE SU CONSTRUCTOR
+    @staticmethod
+    def nuevoAlojamiento(valores):
+
+        nombre = valores[0]
+        locacion = valores[1]
+        precio = valores[2]
+        estrellas = valores[3]
+
+        nuevoAlojamiento = Alojamiento(nombre, locacion, precio, estrellas)
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # RECIBE UN NOMBRE DE UN ALOJAMIENTO, BUSCA SI EXISTE UN ALOJAMIENTO CON ESE NOMBRE, SI ES ASÍ LO ELIMINA Y RETORNA TRUE, DE LO
+    # CONTRARIO RETORNA FALSE
+    @staticmethod
+    def retirarAlojamiento(nombre):
+        alojamiento_encontrado = False
+        if Alojamiento.buscarAlojamientoPorNombre(nombre) != None:
+            i = 0
+            while i < len(Alojamiento.getAlojamientos()):
+                if Alojamiento.getAlojamientos()[i].getNombre().lower() == nombre.lower():
+                    Alojamiento.getAlojamientos().pop(i)
+                    alojamiento_encontrado = True
+                    break
+                i += 1
+        return alojamiento_encontrado
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    #FINALIZA EL SISTEMA DE ADMINISTRACION DE VUELOS Y SERIALIZA LOS OBJETOS
+    @staticmethod
+    def salirDelSistema():
+        picklefile = open('./baseDeDatos/Aerolineas', 'wb')
+        picklefile2 = open('./baseDeDatos/Alojamientos','wb')
+        pickle.dump(Aerolinea._aerolineas, picklefile)
+        pickle.dump(Alojamiento._alojamientos,picklefile2)
+        picklefile.close()
+        picklefile2.close()
+        quit()
+
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # ESTE METODO RECIBE COMO PARAMETRO UN DESTINO (STRING) Y UN FRAME. RECORRE CADA AEROLINEA EJECUTANDO EL METODO DE AEROLINEA buscarVueloPorDestino()
+    # PARA ALMACENAR ESTOS VUELOS EN UNA LISTA Y EJECUTAR EL METODO mostrarTablaDeVuelos, DONDE SE LLENARA UN LABEL CON ESTA INFO.
+    # SI ENCONTRO AL MENOS UN VUELO EN ALGUNA AEROLINEA, RETORNA UNA LISTA QUE CONTIENE LA LISTA DE VUELOS Y LA LISTA DE LOS NOMBRES DE LAS
+    # AEROLINEAS QUE TIENEN VUELOS HACIA ESE DESTINO
+
+    @staticmethod
+    def consultarVuelosPorDestino(destino, frame_operaciones):
+        lista_vuelos_nombres = []
+        vuelos = []
+        nombreAerolineas =[]
+
+        aerolineasDisponibles = Aerolinea.getAerolineas()
+        i = 0
+        while i < len(aerolineasDisponibles):
+            aerolinea = aerolineasDisponibles[i]
+            vuelosPorDestino = aerolinea.buscarVueloPorDestino(aerolinea.vuelosDisponibles(aerolinea.getVuelos()), destino)
+            if len(vuelosPorDestino) != 0:
+                label = Label(frame_operaciones)
+                Admin.mostrarTablaDeVuelos(aerolinea, vuelosPorDestino, label)
+                vuelos.append(label)
+                nombreAerolineas.append(aerolinea.getNombre())
+            i += 1
+
+        lista_vuelos_nombres.append(vuelos)
+        lista_vuelos_nombres.append(nombreAerolineas)
+
+        return lista_vuelos_nombres
+
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # ESTE METODO RECIBE COMO PARAMETRO UN DESTINO (STRING), UNA FECHA (STRING) Y UN FRAME. RECORRE CADA AEROLINEA EJECUTANDO EL METODO DE
+    # AEROLINEA buscarVueloPorDestino() Y LUEGO buscarVueloPorFecha() PARA ALMACENAR ESTOS VUELOS EN UNA LISTA Y EJECUTAR EL METODO
+    # mostrarTablaDeVuelos, DONDE SE LLENARA UN LABEL CON ESTA INFO. SI ENCONTRO AL MENOS UN VUELO EN ALGUNA AEROLINEA, RETORNA UNA LISTA QUE
+    # CONTIENE LA LISTA DE VUELOS Y LA LISTA DE LOS NOMBRES DE LAS AEROLINEAS QUE TIENEN VUELOS HACIA ESE DESTINO
+
+    @staticmethod
+    def consultarVuelosPorDestinoYFecha(destino, fecha, frame_operaciones):
+
+        lista_vuelos_nombres = []
+        vuelos = []
+        nombreAerolineas =[]
+
+        aerolineasDisponibles = Aerolinea.getAerolineas()
+        i = 0
+        while i < len(aerolineasDisponibles):
+            aerolinea = aerolineasDisponibles[i]
+            vuelosPorDestino = aerolinea.buscarVueloPorDestino(aerolinea.vuelosDisponibles(aerolinea.getVuelos()), destino)
+            if len(vuelosPorDestino) != 0:
+                vuelosPorFecha = aerolinea.buscarVueloPorFecha(vuelosPorDestino, fecha)
+                if len(vuelosPorFecha) != 0:
+                    label = Label(frame_operaciones)
+                    Admin.mostrarTablaDeVuelos(aerolinea, vuelosPorFecha, label)
+                    vuelos.append(label)
+                    nombreAerolineas.append(aerolinea.getNombre())
+            i += 1
+
+        lista_vuelos_nombres.append(vuelos)
