@@ -15,7 +15,7 @@ class Alojamiento:
 
     #CALCULAR PRECIO DEL ALOJAMIENTO
     def calcularPrecio(self, dias):
-        return int((dias * self._precio_dia))
+        return int(int((dias) * int(self._precio_dia)))
 
     # BUSCAR ALOJAMIENTOS POR...
 

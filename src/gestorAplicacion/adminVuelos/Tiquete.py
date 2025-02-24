@@ -22,6 +22,7 @@ class Tiquete:
         self._silla = silla
         self._pasajero = pasajero
         self._alojamiento = alojamiento
+        self._dias=0
         vuelo.getTiquetes().append(self)
 
     # METODOS
@@ -30,7 +31,7 @@ class Tiquete:
     #	  es guardado en el atributo precio de cada instancia
     def asignarPrecio(self,*args):
         hayDescuento = False
-        precio_total =self._vuelo.getPrecio() + self.getSilla().getClase().value+int(self.getVuelo().getAeronave().Calcular_Consumo_Gasolina(self.getVuelo().getDistancia_en_km())*0.0020)
+        precio_total =int(self._vuelo.getPrecio()) + self.getSilla().getClase().value+int(self.getVuelo().getAeronave().Calcular_Consumo_Gasolina(self.getVuelo().getDistancia_en_km())*0.0020)
         if self._pasajero.getEdad()<5:
             hayDescuento = True
             self._precio = int((precio_total - (precio_total*0.25)))
@@ -39,10 +40,14 @@ class Tiquete:
             hayDescuento = True
         else:
             self._precio = precio_total
+        
+        if self._alojamiento!= None:
+            self._precio+=self._alojamiento.calcularPrecio(self._dias)
 
         if len(args) != 0 :
 
             self._precio += self._alojamiento.calcularPrecio(args[0])
+            self._dias=args[0]
 
         return hayDescuento
 
