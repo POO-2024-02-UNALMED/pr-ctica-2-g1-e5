@@ -499,3 +499,209 @@ class VentanaSecundaria(Tk):
                     self.ventana_operaciones.config(text=tiquete_solicitado.__str__())
 
                 self.ventana_operaciones.pack_forget()
+                self.ventana_operaciones = FieldFrame(self.frame,"Requisito",["Dias de estadia"],"valor",["1"],None,["int"])
+                self.ventana_operaciones.botonAceptar.config(command=diasDeEstadia)
+
+            # tabla de alojamientos disponibles en el lugar de destino, de donde se puede seleccionar un alojamiento
+            label= Label(self.ventana_operaciones,bg="#bae7ec")
+            label.pack()
+            label["text"]+="\n"+ "-------------------------------------------------------------"
+            label["text"]+="\n"+"{0:>10} {1:>15} {2:>18} {3:>12}".format("NOMBRE", "LOCACION", "PRECIO POR DIA", "ESTRELLAS")
+            label["text"]+="\n"+"-------------------------------------------------------------"
+
+            j = 0
+            while j < len(lista_alojamientos):
+                label_repetido =Label(self.ventana_operaciones,bg="#bae7ec")
+                label_repetido.pack()
+                label_repetido["text"]+="{0:>13} {1:>11} {2:>16} {3:>11}".format(lista_alojamientos[j].getNombre(), lista_alojamientos[j].getLocacion(), lista_alojamientos[j].getPrecio_dia(), lista_alojamientos[j].getEstrellas())
+                label_repetido.bind("<ButtonPress-1>",lambda event,a=lista_alojamientos[j].getNombre():alojamientoSeleccionado(a))
+                j += 1
+
+            label_repetido["text"]+="\n"+"-------------------------------------------------------------"
+            label_repetido["text"]+="\n"
+            return
+
+        formulario.botonAceptar.config(command=eventoAgregarAlojamiento)
+
+    #--------------------------------------------------------------------------------------------------------------------------------------
+    # Permite modificar el alojamiento y la silla de un tiquete, solicitando un ID de tiquete y verificando que existe, posteriormente se
+    # pregunta si se desea cambiar la silla o el alojamiento, y segun lo que escoja, se ejecutan los métodos internos modificarSilla o
+    # modificarAlojamiento
+
+    def modificarTiquete(self):
+        self.label_proceso.config(text = "Modificar Tiquete")
+        self.label_descripcion.config(text = "Puede modificar los atributos Silla y Alojamiento (si ya tiene uno) de un tiquete comprado previamente")
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones = Frame(self.frame, bg="#bae7ec")
+        self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=X)
+
+        #Funcion que se dispara al darle en el boton aceptar del formulario que pregunta por el ID del tiquete. Se busca el tiquete para verificar
+        # su existencia, y se despliegan dos botones que permiten elegir si se quiere modificar la silla o el alojamiento del tiquete
+
+        def editarTiquete():
+
+            try:
+                hay_excepcion = formulario.aceptar()
+            except ExcepcionEnteroString as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.modificarTiquete()
+                return
+            except ExcepcionEnteroFloat as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.modificarTiquete()
+                return
+
+            if hay_excepcion:
+                self.modificarTiquete()
+                return
+
+            try:
+                tiquete = Aerolinea.BuscarTiquete(int(formulario.valor_entradas[0]))
+            except ExcepcionIdTiquete as awa:
+                messagebox.showwarning(title="Advertencia",message= awa.mensaje_error_inicio)
+                self.modificarTiquete()
+                return
+
+            self.ventana_operaciones.pack_forget()
+            self.ventana_operaciones = Frame(self.frame,relief="ridge",bd=2,bg="#bae7ec")
+            self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2)
+            label = Label(self.ventana_operaciones,text="Que opcion desea modificar de su tiquete",font = ("Segoe UI", 10),bg="#bae7ec")
+            label.grid(row =0,column=0 ,columnspan=2,ipadx=10,ipady=10)
+            boton_modificar_alojamiento = Button(self.ventana_operaciones,text = "Modificar alojamiento",font=("Segoe UI", 10),command=lambda:modificarAlojamiento(tiquete),bg="#bae7ec")
+            boton_modificar_alojamiento.grid(row=1,column=0,padx=2,ipadx=5)
+            boton_modificar_silla = Button(self.ventana_operaciones,text = "Modificar silla",font = ("Segoe UI", 10),command=lambda:self.modificarSilla(2,tiquete),bg="#bae7ec")
+            boton_modificar_silla.grid(row=1,column=1,padx=2,ipadx=5)
+
+        # Se llama cuando se elige modificarAlojamiento en el Frame anterior, luego de esto se siguen pasos similares a los expuestos en
+        # agregar alojamiento para modificar el alojamiento que se tenia previamente.
+
+        def modificarAlojamiento(tiquete):
+            self.label_proceso.config(text = "Modificar alojamiento")
+            self.label_descripcion.config(text = "Cambie el alojamiento que agrego a su tiquete de compra, seleccionando uno nuevo de la lista")
+
+            self.ventana_operaciones.pack_forget()
+            self.ventana_operaciones = Frame(self.frame)
+            self.ventana_operaciones.pack()
+
+            try:
+                tiquete_solicitado = Admin.buscarTiqueteYAlojamiento(int(tiquete.getId()),2)
+
+            except ExcepcionModificarAlojamiento as uwu:
+                messagebox.showwarning(title ="Advertencia",message = uwu.mensaje_error_inicio)
+                self.modificarTiquete()
+                return
+
+            lista_alojamientos= Alojamiento.buscarAlojamientoPorUbicacion(tiquete_solicitado.getVuelo().getDestino())
+            if len(lista_alojamientos) == 0:
+                mensaje = messagebox.showinfo(title = "Modificar alojamiento",message = "No hay alojamientos en ese destino.")
+                return
+
+            # Se llama a la funcion cuando se selecciona un alojamiento de la lista de alojamientos, se verifica que esta disponible
+            # y posteriormente se pregunta por los días de estadía, para terminar imprimiendo por pantalla el tiquete
+
+            def alojamientoSeleccionado(nombre):
+                self.label_descripcion.config(text = "Ingrese los dias que se va a quedar en el alojamiento seleccionado")
+
+                alojamiento_solicitado=Admin.solicitarAlojamiento(tiquete,nombre)
+                if alojamiento_solicitado == None:
+                    mensaje = messagebox.showinfo(title = "Modificar alojamiento", message = "Ese alojamiento no está disponible")
+                    return
+                self.ventana_operaciones.pack_forget()
+
+                # Es llamada cuando se ingresan los dias de estadia, se encarga de añadir el alojamiento al tiquete
+                # con la clase auxiliar, y por ultimo imprime un resumen de la compra sumandole el precio del alojamiento
+
+                def diasDeEstadia():
+                    self.label_descripcion.config(text = "Gracias por su compra! Este es su tiquete:")
+                    try:
+                        hay_excepcion = self.ventana_operaciones.aceptar()
+                    except ExcepcionEnteroString as owo:
+                        messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                        alojamientoSeleccionado(nombre)
+                        return
+                    except ExcepcionEnteroFloat as owo:
+                        messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                        alojamientoSeleccionado(nombre)
+                        return
+
+                    if hay_excepcion:
+                        alojamientoSeleccionado(nombre)
+                        return
+                    self.ventana_operaciones.pack_forget()
+
+                    Admin.agregarAlojamiento(tiquete,alojamiento_solicitado,self.ventana_operaciones.valor_entradas[0])
+                    messagebox.showinfo(title="Modificar alojamiento",message= "Su alojamiento ha sido modificado con exito.")
+                    self.ventana_operaciones = Label(self.frame,bg="#bae7ec")
+                    self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=X)
+                    self.ventana_operaciones.config(text=tiquete.__str__())
+
+                self.ventana_operaciones = FieldFrame(self.frame,"Requisito",["Dias de estadia"],"valor",["1"],None,["int"])
+                self.ventana_operaciones.botonAceptar.config(command=diasDeEstadia)
+
+            # tabla de alojamientos disponibles en el lugar de destino, de donde se puede seleccionar un alojamiento
+            label= Label(self.ventana_operaciones,bg="#bae7ec")
+            label.pack()
+            label["text"]+="\n"+ "-------------------------------------------------------------"
+            label["text"]+="\n"+"{0:>10} {1:>15} {2:>18} {3:>12}".format("NOMBRE", "LOCACION", "PRECIO POR DIA", "ESTRELLAS")
+            label["text"]+="\n"+"-------------------------------------------------------------"
+
+            j = 0
+            while j < len(lista_alojamientos):
+                label_repetido =Label(self.ventana_operaciones,bg="#bae7ec")
+                label_repetido.pack()
+                label_repetido["text"]+="{0:>13} {1:>11} {2:>16} {3:>11}".format(lista_alojamientos[j].getNombre(), lista_alojamientos[j].getLocacion(), lista_alojamientos[j].getPrecio_dia(), lista_alojamientos[j].getEstrellas())
+                label_repetido.bind("<ButtonPress-1>",lambda event,a=lista_alojamientos[j].getNombre():alojamientoSeleccionado(a))
+                j += 1
+
+            label_repetido["text"]+="\n"+"-------------------------------------------------------------"
+            label_repetido["text"]+="\n"
+            return
+
+        formulario = FieldFrame(self.ventana_operaciones,"info",["_ID del tiquete"],"",None,None,["int"])
+        formulario.botonAceptar.config(command=editarTiquete)
+
+    #------------------------------------------------------------------------------------------------------------------------------------
+    # Recibe un numero que indica si se esta eligiendo o modificando una silla. El metodo Permite elegir una silla de acuerdo a los parametros
+    # mostrados en los combobox (Clase y Ubicacion), se la asigna al tiquete pasado como parametro y se imprime por pantalla un resumen de la
+    # compra si los pasos anteriores se realizaron correctamente
+
+    def modificarSilla(self,numero, tiquete):
+            self.ventana_operaciones.pack_forget()
+            self.ventana_operaciones = Frame(self.frame,bg="#bae7ec")
+            self.ventana_operaciones.pack()
+            label_seleccion_silla = Label(self.ventana_operaciones,text="Seleccione el tipo de silla que desea.",bg="#bae7ec")
+            label_seleccion_silla.pack()
+            formulario=FieldFrame(self.ventana_operaciones,"Valores",["Clase","Ubicacion"],"Entradas",None,[True,False,False],["string","string"])
+            formulario.botonBorrar.config(command=lambda:self.modificarSilla(numero,tiquete))
+
+            # Es llamada cuando se escoge la clase y ubicacion de la silla, pasa los datos a la clase auxiliar para que esta se la asigne
+            # al tiquete, posteriormente informa que la accion se ha realizado correctamente e imprime un resumen de la compra del tiquete
+            # por pantalla
+
+            def envioDatos():
+
+                try:
+                    hay_excepcion = formulario.aceptar()
+                except ExcepcionStringNumero as owo:
+                    messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                    self.modificarSilla(numero,tiquete)
+                    return
+
+                if hay_excepcion:
+                    self.modificarSilla(numero,tiquete)
+                    return
+
+                self.label_descripcion.config(text = "Gracias por su compra! Este es su tiquete:")
+
+                dato= formulario.valor_entradas
+                silla = Admin.elegirSilla(tiquete,dato)
+
+                if silla == None:
+                    mensaje = messagebox.showinfo(title = "Elegir silla",message = "No tenemos sillas disponibles con esas caracteristicas.")
+                    self.modificarSilla(numero,tiquete)
+                    return
+
+                formulario.pack_forget()
+                Admin.modificarSilla(numero,tiquete,silla)
+                messagebox.showinfo(title="Elegir",message = "Su silla ha sido asignada con exito.")
+                self.ventana_operaciones.pack_forget()
