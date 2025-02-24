@@ -294,3 +294,208 @@ class VentanaSecundaria(Tk):
                 self.ventana_operaciones.pack_forget()
                 self.ventana_operaciones = Frame(self.frame,relief="groove",bd=2, bg="#bae7ec")
                 self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=BOTH, expand=True)
+
+                try:
+                    hay_excepcion = formulario.aceptar()
+                except ExcepcionEnteroString as owo:
+                    messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                    aerolineaSeleccionada(4)
+                    return
+
+                if hay_excepcion:
+                    aerolineaSeleccionada(9)
+                    return
+
+                id_vuelo = int(formulario.valor_entradas[0])
+                vuelo = aerolinea.buscarVueloPorID(aerolinea.getVuelos(),id_vuelo)
+                if vuelo == None:
+                    messagebox.showinfo(title="Elegir vuelo",message="No existe un vuelo con ese ID en la aerolinea"+aerolinea.getNombre())
+                    return
+
+                self.label_proceso.config(text = "Toma de datos Pasajero")
+                self.label_descripcion.config(text = "Recoge los datos del pasajero al que se le asociará el tiquete de compra")
+
+                label_datos_pasajero = Label(self.ventana_operaciones,text="Ingrese los datos del pasajero.",bg="#bae7ec")
+                label_datos_pasajero.pack()
+                formulario_pasajero= FieldFrame(self.ventana_operaciones,"criterios",["Nombre","Edad","Pasaporte","E-mail"],"dAtOs",None,None,["string","int","string","string"])
+
+                def datosPasajero():
+
+                    self.label_proceso.config(text = "Resumen de la compra")
+                    self.label_descripcion.config(text = "Enseña un breve resumen de la compra efectuada, recogida en el tiquete")
+
+                    try:
+                        hay_excepcion = formulario_pasajero.aceptar()
+                    except ExcepcionEnteroString as owo:
+                        messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                        return
+                    except ExcepcionEnteroFloat as owo:
+                        messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                        return
+                    except ExcepcionStringNumero as owo:
+                        messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                        return
+
+                    if hay_excepcion:
+                        return
+
+                    tiquete=Admin.generarTiquete(vuelo)
+                    formulario_pasajero.pack_forget()
+                    Admin.asignarTiquete(formulario_pasajero.valor_entradas,tiquete)
+                    self.modificarSilla(1,tiquete)  #pendiente modificar
+
+
+                formulario_pasajero.botonAceptar.config(command=datosPasajero)
+
+            formulario.botonAceptar.config(command=idVueloIngresado)
+
+        aerolineas = Combobox(self.ventana_operaciones, values = nombres_aerolineas)
+        aerolineas.pack(padx = 3, pady= 3)
+        aerolineas.bind("<<ComboboxSelected>>",aerolineaSeleccionada)
+
+
+    #-------------------------------------------------------------------------------------------------------------------------------------
+    # Permite realizar la compra de un tiquete para un vuelo disponible, permitiendo buscar por destino y fecha, filtrar los vuelos, seleccionar
+    # el vuelo y la silla a comprar. Por último, se recogen los datos del pasajero y se imprime por pantalla un resumen de la compra
+
+    def generarTiquete(self):
+        self.label_proceso.config(text = "Compra de un tiquete")
+        self.label_descripcion.config(text = "Permite realizar la compra de un tiquete para un vuelo, buscando por destino o por destino y fecha.")
+
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones= Frame(self.frame,relief="groove",bd=2, bg="#bae7ec")
+        self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=BOTH, expand=True)
+        frame_botones = Frame(self.ventana_operaciones, bg="#bae7ec")
+        frame_botones.pack(ipadx = 10, ipady =10, padx = 10, pady= 10)
+        label = Label(frame_botones,text="Buscar vuelo por:", font=("Cascadia Code", 15), bg="#bae7ec")
+        label.grid(row = 0, column = 1, columnspan= 3)
+
+        # Es llamada si se eligió buscar un vuelo por Destino, recogiendo el destino deseado en un formulario y pasándoselo a la funcion
+        # buscarVuelos
+
+        def buscarPorDestino():
+            self.label_proceso.config(text = "Buscar por destino")
+            self.label_descripcion.config(text = "Ingresa el destino al que quiere viajar")
+
+            boton_destino["state"]=DISABLED
+            boton_destino_fecha["state"]=DISABLED
+            formulario_destino=FieldFrame(self.ventana_operaciones,"Criterio",["Destino"],"Valor",None,None,["string"])
+            formulario_destino.botonAceptar.config(command=lambda:self.buscarVuelos(formulario_destino))
+
+        # Es llamada si se eligió buscar un vuelo por Destino y fecha, recogiendo el destino y la fecha deseados en un formulario y pasándoselo
+        # a la funcion buscarVuelos
+
+        def buscarPorDestinoYFecha():
+            self.label_proceso.config(text = "Buscar por destino y fecha")
+            self.label_descripcion.config(text = "Ingresa el destino y la fecha en la que quiere viajar")
+
+            boton_destino_fecha["state"]=DISABLED
+            boton_destino["state"]=DISABLED
+            formulario_destino_fecha=FieldFrame(self.ventana_operaciones,"Criterio",["Destino","Fecha (DD-MM-AAAA)"],"Valor",None,None,["string","string"])
+            formulario_destino_fecha.botonAceptar.config(command=lambda:self.buscarVuelos(formulario_destino_fecha))
+
+        boton_destino = Button(frame_botones,text = "Destino",font=("Cascadia Code", 10),command=buscarPorDestino, bg="#9ccce0", activebackground="#94c0d3")
+        boton_destino.grid(row=2,column=0,padx=2,ipadx=5, columnspan= 2)
+        boton_destino.bind("<Enter>", self.inBoton) 
+        boton_destino.bind("<Leave>", self.outBoton)
+        boton_destino_fecha = Button(frame_botones,text = "Destino y fecha",font = ("Cascadia Code", 10),command=buscarPorDestinoYFecha, bg="#9ccce0", activebackground="#94c0d3")
+        boton_destino_fecha.grid(row=2,column=2,padx=2,ipadx=5, columnspan=2)
+        boton_destino_fecha.bind("<Enter>", self.inBoton) 
+        boton_destino_fecha.bind("<Leave>", self.outBoton)
+
+    #-------------------------------------------------------------------------------------------------------------------------------------
+    # Permite agregar un alojamiento a un tiquete comprado previamente, verificando que el tiquete exista y que no se tenga un alojamiento
+    # comprado previamente, luego se listan (Label) los alojamientos ofrecidos en el destino que tiene el tiquete para que el usuario escoja
+    # uno de ellos. Si esta disponible, se procede a preguntar (FieldFrame) cuantos dias son de estadia, se recalcula el precio del tiquete
+    # y se muestra un resumen de la compra.
+
+    def agregarAlojamientoTiquete(self):
+        self.label_proceso.config(text = "Añadir un alojamiento a su compra")
+        self.label_descripcion.config(text = "Permite añadir un alojamiento a su tiquete,\nmostrando los alojamientos disponibles en el lugar de destino")
+
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones = Frame(self.frame, bg="#bae7ec")
+        self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=BOTH, expand=True)
+        formulario = FieldFrame(self.ventana_operaciones,"info",["_ID del tiquete"],"",None,None,["int"])
+
+        # Funcion que se dispara cuando se presiona el botón aceptar del formulario que pregunta por el ID del tiquete al que se le desea cambiar
+        # el alojamiento, desde aca se hacen los pasos necesarios para preguntar por el alojamiento que se quiere agregar y los días de estadia
+        # para adjuntarselos al tiquete y recalcular su precio
+
+        def eventoAgregarAlojamiento():
+            self.label_descripcion.config(text = "Agregue un alojamiento a su tiquete de compra, seleccionando uno de la lista")
+            formulario.pack_forget()
+
+            try:
+                hay_excepcion = formulario.aceptar()
+            except ExcepcionEnteroString as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.agregarAlojamientoTiquete()
+                return
+            except ExcepcionEnteroFloat as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.agregarAlojamientoTiquete()
+                return
+
+            if hay_excepcion:
+                self.agregarAlojamientoTiquete()
+                return
+
+            id_tiquete = formulario.valor_entradas[0]
+
+            try:
+                tiquete_solicitado =Admin.buscarTiqueteYAlojamiento(int(id_tiquete), 1)
+
+            except ExcepcionIdTiquete as awa:
+                messagebox.showwarning(title="Advertencia",message= awa.mensaje_error_inicio)
+                self.agregarAlojamientoTiquete()
+                return
+
+            except ExcepcionAgregarAlojamiento as uwu:
+                messagebox.showwarning(title ="Advertencia",message = uwu.mensaje_error_inicio)
+                self.agregarAlojamientoTiquete()
+                return
+
+            lista_alojamientos= Alojamiento.buscarAlojamientoPorUbicacion(tiquete_solicitado.getVuelo().getDestino())
+            if len(lista_alojamientos) == 0:
+                mensaje = messagebox.showinfo(title = "Agregar alojamiento",message = "No hay alojamientos en ese destino.")
+                return
+
+            # Se llama a la funcion cuando se selecciona un alojamiento de la lista de alojamientos, se verifica que esta disponible
+            # y posteriormente se pregunta por los días de estadía, para terminar imprimiendo por pantalla el tiquete
+            def alojamientoSeleccionado(nombre):
+                self.label_descripcion.config(text = "Ingrese los dias que se va a quedar en el alojamiento seleccionado")
+
+                self.ventana_operaciones.pack_forget()
+                alojamiento_solicitado=Admin.solicitarAlojamiento(tiquete_solicitado,nombre)
+                if alojamiento_solicitado == None:
+                    mensaje = messagebox.showinfo(title = "Agregar alojamiento", message = "Ese alojamiento no está disponible")
+                    return
+
+                # Es llamada cuando se ingresan los dias de estadia, se encarga de añadir el alojamiento al tiquete
+                # con la clase auxiliar, y por ultimo imprime un resumen de la compra sumandole el precio del alojamiento
+                def diasDeEstadia():
+                    self.label_descripcion.config(text = "Gracias por su compra! Este es su tiquete:")
+                    self.ventana_operaciones.pack_forget()
+
+                    try:
+                        hay_excepcion =self.ventana_operaciones.aceptar()
+                    except ExcepcionEnteroString as owo:
+                        messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                        alojamientoSeleccionado(nombre)
+                        return
+                    except ExcepcionEnteroFloat as owo:
+                        messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                        alojamientoSeleccionado(nombre)
+                        return
+
+                    if hay_excepcion:
+                        alojamientoSeleccionado(nombre)
+                        return
+
+                    Admin.agregarAlojamiento(tiquete_solicitado,alojamiento_solicitado,self.ventana_operaciones.valor_entradas[0])
+                    self.ventana_operaciones = Label(self.frame,bg="#bae7ec")
+                    self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=X)
+                    self.ventana_operaciones.config(text=tiquete_solicitado.__str__())
+
+                self.ventana_operaciones.pack_forget()
