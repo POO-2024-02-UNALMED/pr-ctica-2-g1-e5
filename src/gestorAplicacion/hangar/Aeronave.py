@@ -7,7 +7,7 @@ class Aeronave(ABC):
 
     # CONTRUCTOR
     def __init__(self, nombre, aerolinea=0):
-        self.Gasto_gasolina = 10000
+        self.GASTO_GASOLINA = 10000
         self._descompuesto = False
         self._SILLAS_ECONOMICAS = []
         self._SILLAS_EJECUTIVAS = []
@@ -171,4 +171,4 @@ class Aeronave(ABC):
     #	Y RETONARNA EL COSTO TOTAL DE GASOLINA PARA RECORRER EL TRAYECTO
     @abstractmethod
     def Calcular_Consumo_Gasolina(self, distancia_en_km):
-        pass
+        return distancia_en_km*self.GASTO_GASOLINA*0.05
