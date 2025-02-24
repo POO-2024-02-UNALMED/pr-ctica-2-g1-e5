@@ -14,23 +14,21 @@ class FieldFrame (Frame):
         self.entradas = {} # Diccionario desde donde se podrá acceder a la entrada asociada a cada criterio
         self.valor_entradas =[] # Lista que contendra el valor de las entradas pasadas por el usuario
         self.pack()
-        self.config(relief = "groove") 
-        self.config(bd=20)
-        self.config(borderwidth=2) 
+        self.config(relief = "groove", bd=2, bg="#bae7ec") 
         self.tipo_esperado = tipo_esperado
         #Titulos del formulario
-        titulo1 = Label(self, text = tituloCriterios.upper() , anchor="center", borderwidth=2, font = ("Segoe UI", 11, 'bold'))
+        titulo1 = Label(self, text = tituloCriterios.upper() , anchor="center", borderwidth=2, font = ("Cascadia Code", 11, 'bold'),bg="#bae7ec")
         titulo1.grid(row = 0, column = 0, ipadx=20, padx=30, pady = 2)
         
-        titulo2 = Label(self, text = tituloValores.upper(), anchor="center", borderwidth=2, font = ("Segoe UI", 11, 'bold'))
+        titulo2 = Label(self, text = tituloValores.upper(), anchor="center", borderwidth=2, font = ("Cascadia Code", 11, 'bold'),bg="#bae7ec")
         titulo2.grid(row = 0, column = 1, ipadx=20, padx=30, pady = 2)
         def validar_longitud(texto):
             return len(texto) <= 3
         #Creacion de Label para los criterios y Entry para las entradas
         for i in range(0, len(criterios)):
-              
-            lab = Label(self, width = 22, text = criterios[i].strip("_"), anchor = "center", font = ("Segoe UI", 10))
-            ent = Entry(self)
+
+            lab = Label(self, width = 25, text = criterios[i].strip("_"), anchor = "center", font = ("Cascadia Code", 10),bg="#bae7ec")
+            ent = Entry(self, bg="#daf4fe")
 
             if criterios[i].startswith("_"):
                 v = parent.register(validar_longitud)
@@ -57,17 +55,27 @@ class FieldFrame (Frame):
         col_count, row_count = self.grid_size()
 
         #Boton aceptar
-        self.botonAceptar = Button(self, width=10, text='Aceptar', font = ("Segoe UI", 10), relief=GROOVE, cursor='hand2', command=self.aceptar)
+        self.botonAceptar = Button(self, width=10, text='Aceptar', font = ("Cascadia Code", 10), relief=GROOVE, cursor='hand2', command=self.aceptar,activebackground="#94c0d3", bg="#9ccce0")
         self.botonAceptar.grid(row = row_count, column = 0, ipadx=20, padx=30, pady = 6)
+        self.botonAceptar.bind("<Enter>",self.inBoton)
+        self.botonAceptar.bind("<Leave>",self.outBoton)
 
         #Boton borrar
-        self.botonBorrar = Button(self, width=10, text='Borrar', font = ("Segoe UI", 10), relief=GROOVE, cursor='hand2', command = self.borrarValores)
+        self.botonBorrar = Button(self, width=10, text='Borrar', font = ("Cascadia Code", 10), relief=GROOVE, cursor='hand2', command = self.borrarValores,activebackground="#94c0d3", bg="#9ccce0")
         self.botonBorrar.grid(row = row_count, column = 1, ipadx=20, padx=30, pady = 5)
- 
+        self.botonBorrar.bind("<Enter>",self.inBoton)
+        self.botonBorrar.bind("<Leave>",self.outBoton)
+
     #Guarda los datos puestos en los cuadros de texto en la lista valor_entradas
     #Ademas, verifica que todos los textos tengan un valor, y en caso de que falte alguno se disparara una excepcion
     #en la que por medio de una ventana de advertencia se le indicara al usuario cuales campos le faltan por llenar.
- 
+    def inBoton(self, event):
+        event.widget.config(bg="#badeed") 
+
+    def outBoton(self, event):
+        event.widget.config(bg="#9ccce0")  
+
+
     def aceptar(self):
         self.valor_entradas=[] 
         for criterio in self.entradas:

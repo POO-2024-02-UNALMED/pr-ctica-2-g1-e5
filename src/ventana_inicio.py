@@ -7,7 +7,7 @@ class ventana_inicio(Tk):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         # CONFIGURACION PARAMETROS PRINCIPALES DE LA VENTANA
-        self.geometry("850x560")
+        self.geometry("875x560")
         self.minsize(850,560)
         self.title("TURBINA TOURS AND RESORT")
         self.option_add("*tearOff", False)
@@ -18,7 +18,8 @@ class ventana_inicio(Tk):
 
         # CONFIGURACION ZONA DE MENU
         self.menubar = Menu(self)
-        self.menuInicio = Menu(self.menubar)
+        self.option_add("*Menu.font", ("Cascadia Code", 9))
+        self.menuInicio = Menu(self.menubar, bg="#f0f0f0", fg="black", activebackground="#2171ea", activeforeground="white")
         self.menubar.add_cascade(menu=self.menuInicio, label="Inicio")
         self.menuInicio.add_command(label="Descripcion",command=self.desno)
         self.menuInicio.add_command(label="Salir",command=self.salir)
@@ -26,11 +27,11 @@ class ventana_inicio(Tk):
 
         #CONFIGURACION ZONA FRAMES
 
-        self.P1 = Frame(self, bg="#000000")
+        self.P1 = Frame(self, bg="#333")
         self.P1.place(relwidth=0.50, relheight=1)
         self.P3 = Frame(self.P1)
         self.P3.place(relwidth=0.985, relheight=0.285, relx=0.007, rely=0.009)
-        self.saludo = Label(self.P3, text="BIENVENIDO A TURBINA TOURS AND RESORT\n""HAZ CLICK EN LA IMAGEN PARA INGRESAR AL SISTEMA\n""⇣", font=("Segoe UI", 12), bg="#13bcb7")
+        self.saludo = Label(self.P3, text="BIENVENIDO A TURBINA TOURS AND RESORT\n""HAZ CLICK EN LA IMAGEN PARA INGRESAR AL SISTEMA\n""⇣", font=("Cascadia Code", 11), bg="#48e")
         self.P4 = Frame(self.P1, bg="pink")
         self.P4.place(relwidth=0.985, relheight=0.685, relx=0.007, rely=0.305)
         self.contenedorImagen = Label(self.P4)
@@ -39,13 +40,13 @@ class ventana_inicio(Tk):
         a, al=self.P4.winfo_width(),self.P4.winfo_height()
         self.ImagenAplicacion = self.ImagenAplicacion.resize((a, al), Image.Resampling.LANCZOS)
         self.contenedorImagen["image"] = ImageTk.PhotoImage(self.ImagenAplicacion)
-        self.P2 = Frame(self, bg="black")
+        self.P2 = Frame(self, bg="#333")
         self.P2.place(relwidth=0.50, relheight=1, relx=0.50)
-        self.P5 = Frame(self.P2, bg="Gray")
+        self.P5 = Frame(self.P2, bg="#d0b642")
         self.P5.place(relwidth=0.985, relheight=0.285, relx=0.007, rely=0.009)
-        self.textoHDV = Label(self.P5, textvariable=self.varHDV, font = ("Segoe UI", 8))
+        self.textoHDV = Label(self.P5, textvariable=self.varHDV, font = ("Cascadia Code", 9), bg="#fff8cd", bd="3", relief="raised")
         self.textoHDV.bind('<ButtonPress-1>', self.cambioHDV)
-        self.textoHDV.place(relheight=0.53, relwidth=0.53,relx=0.24, rely=0.23)
+        self.textoHDV.place(relheight=0.56, relwidth=0.6,relx=0.24, rely=0.23)
         self.P6 = Frame(self.P2,bg="Gray")
         self.P6.place(relwidth=0.985, relheight=0.685, relx=0.007, rely=0.305)
         self.saludo.place(relwidth=1, relheight=1)
@@ -80,8 +81,8 @@ class ventana_inicio(Tk):
             self.cambio_posiciones.append(imagen)
 
         for widget in [self.W1, self.W2, self.W3, self.W4]:
-             widget.grid_rowconfigure(0, weight=1)  # Centrado vertical
-             widget.grid_columnconfigure(0, weight=1)  # Centrado horizontal
+            widget.grid_rowconfigure(0, weight=1)  # Centrado vertical
+            widget.grid_columnconfigure(0, weight=1)  # Centrado horizontal
 
         self.im_desa_pos1 = Label(self.W1)
         self.im_desa_pos2 = Label(self.W2)
@@ -200,7 +201,7 @@ class ventana_inicio(Tk):
             self.varHDV.set("Nombre: Simon Guarin Cortes  \n""Edad : 18 años \n""Programa: Ingeniería de sistemas\n")
             self.evento()
         elif self.numClicksHDV == 4:
-            self.varHDV.set("Nombre: Jesus Camilo Miranda Aguirre \n""Edad : 20 años \n""Programa: Ingeniería de sistemas\n")
+            self.varHDV.set("Nombre:Jesus Camilo Miranda Aguirre \n""Edad : 20 años \n""Programa: Ingeniería de sistemas\n")
             self.evento()
         elif self.numClicksHDV == 5:
             self.varHDV.set("Nombre: Andres Jacobo Leal Aguirre \n""Edad : 18 años \n""Programa: Ingeniería de sistemas\n")

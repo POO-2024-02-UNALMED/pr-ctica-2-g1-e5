@@ -8,6 +8,7 @@ from gestorAplicacion.hangar.Clase import Clase
 from gestorAplicacion.hangar.Silla import Silla
 from gestorAplicacion.hangar.Ubicacion import Ubicacion
 from gestorAplicacion.alojamiento.Alojamiento import Alojamiento
+from multimethod import multimethod
 
 
 class Tiquete:

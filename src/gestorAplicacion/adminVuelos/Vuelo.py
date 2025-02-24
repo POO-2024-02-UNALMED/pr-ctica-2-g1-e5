@@ -1,15 +1,18 @@
 ﻿# CLASE TIQUETE
 # AUTORES: JHONEYKER DELGADO, EMMANUEL VALENCIA, SIMON GUARIN, CAMILO MIRANDA Y JACOBO LEAL.
 from gestorAplicacion.hangar import *
-from gestorAplicacion.adminVuelos.Tiquete import Tiquete
+from .Tiquete import Tiquete
+from multimethod import multimethod
+from gestorAplicacion.hangar.Aeronave import Aeronave
 
 # CONTIENE LA INFORMACION PERTINENTE DE UN VUELO, ADEMAS DE LA LISTA DE TIQUETES QUE FUERON ASOCIADOS AL MISMO.
 class Vuelo():
 
     # ATRIBUTOS
-    
+
     #CONSTRUCTOR
-    def __init__(self, iD, precio, origen, destino, aeronave, distancia, fecha_de_salida, hora_de_salida=0):
+    @multimethod
+    def __init__(self, iD:int, precio:int, origen:str, destino:str, aeronave: Aeronave, distancia:int, fecha_de_salida:str, hora_de_salida:str):
         self._ID = iD
         self._precio = precio
         self._origen = origen
@@ -18,6 +21,18 @@ class Vuelo():
         self._distancia_en_km = distancia
         self._fecha_de_salida = fecha_de_salida
         self.setHora_de_salida(hora_de_salida)
+        self.getAeronave().getAerolinea().agregarVuelo(self)
+        self._tiquetes = []
+        self._estaCompleto = False
+    @multimethod
+    def __init__(self, iD:int, precio:int, origen:str, destino:str, aeronave: Aeronave, distancia:int, fecha_de_salida:str):
+        self._ID = iD
+        self._precio = precio
+        self._origen = origen
+        self._destino = destino
+        self._aeronave = aeronave
+        self._distancia_en_km = distancia
+        self._fecha_de_salida = fecha_de_salida
         self.getAeronave().getAerolinea().agregarVuelo(self)
         self._tiquetes = []
         self._estaCompleto = False
@@ -31,8 +46,8 @@ class Vuelo():
                 return tiquetes[i]
             i += 1
         return None
-    
-    
+
+
     #GETTERS Y SETTERS
 
     def getID(self):

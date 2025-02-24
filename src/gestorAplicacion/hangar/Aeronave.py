@@ -2,6 +2,7 @@
 # AUTORES: JHONEYKER DELGADO, EMMANUEL VALENCIA, SIMON GUARIN, CAMILO MIRANDA Y JACOBO LEAL.
 from abc import ABC, abstractmethod
 
+
 class Aeronave(ABC):
 
     # CONTRUCTOR
@@ -160,7 +161,7 @@ class Aeronave(ABC):
                 if numPosicion % 6 == 0 or numPosicion% 6 == 5:
                     ubicacion = Ubicacion.VENTANA
                 elif numPosicion % 6 == 1 or numPosicion % 6 == 4:
-                        ubicacion = Ubicacion.CENTRAL
+                    ubicacion = Ubicacion.CENTRAL
                 elif numPosicion % 6 == 2 or numPosicion % 6 == 3:
                     ubicacion = Ubicacion.PASILLO
                 aeronave.getSILLASECONOMICAS().append(Silla(Clase.ECONOMICA, numPosicion, ubicacion))

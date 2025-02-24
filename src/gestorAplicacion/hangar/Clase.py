@@ -5,3 +5,4 @@ from enum import Enum
 class Clase(Enum):
     ECONOMICA = 10000
     EJECUTIVA = 70000
+

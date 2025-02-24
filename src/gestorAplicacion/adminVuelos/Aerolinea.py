@@ -1,9 +1,9 @@
 # CLASE AEROLINEA
 #AUTORES: JHONEYKER DELGADO, EMMANUEL VALENCIA, SIMON GUARIN, CAMILO MIRANDA Y JACOBO LEAL.
 from excepciones.ErrorAsignacion import ExcepcionIdTiquete
-from gestorAplicacion.hangar import *
-from gestorAplicacion.adminVuelos.Vuelo import Vuelo
-from gestorAplicacion.adminVuelos.Tiquete import Tiquete
+from .Vuelo import Vuelo
+from .Tiquete import Tiquete
+from multimethod import multimethod
 
 # ALMACENA LA INFORMACION DE TODAS LAS AEROLINEAS CREADAS, ADEMAS DE LOS VUELOS Y AERONAVES ASOCIADOS A CADA UNA DE ELLAS
 # CON LOS METODOS NECESARIOS PARA ACCEDER A ESTA INFORMACION A TRAVES DE DISTINTOS PARAMETROS.
@@ -13,14 +13,17 @@ class Aerolinea():
     _aerolineas = []
 
     #CONSTRUCTOR
-    def __init__(self, nombre, vuelos=0):
+    @multimethod
+    def __init__(self, nombre:str, vuelos:Vuelo):
         self._aeronaves = []
-        if vuelos==0:
-            self._vuelos = []
-        else:
-            self._vuelos = vuelos
-
+        self._vuelos = vuelos
         self._nombre = nombre
+        Aerolinea._aerolineas.append(self)
+    @multimethod
+    def __init__(self, nombre:str):
+        self._aeronaves = []
+        self._nombre = nombre
+        self._vuelos=[]
         Aerolinea._aerolineas.append(self)
 
     def toString(self):

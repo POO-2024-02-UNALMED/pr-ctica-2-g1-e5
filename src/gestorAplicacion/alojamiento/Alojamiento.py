@@ -12,6 +12,7 @@ class Alojamiento:
         self._estrellas = estrellas
         Alojamiento._alojamientos.append(self)
 
+
     #CALCULAR PRECIO DEL ALOJAMIENTO
     def calcularPrecio(self, dias):
         return int((dias * self._precio_dia))

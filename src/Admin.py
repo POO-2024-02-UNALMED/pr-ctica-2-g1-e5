@@ -62,6 +62,7 @@ class Admin(object):
             tiquete = Tiquete(int(ID_tiquete), vuelo.getPrecio(), vuelo)
         return tiquete
 
+
     #--------------------------------------------------------------------------------------------------------------------------------------
     # CREA UN PASAJERO Y SE LO ASIGNA AL TIQUETE, POSTERIORMENTE SE LE ASIGNA EL PRECIO AL TIQUETE
     @staticmethod
@@ -286,6 +287,7 @@ class Admin(object):
         picklefile2.close()
         quit()
 
+
     #--------------------------------------------------------------------------------------------------------------------------------------
     # ESTE METODO RECIBE COMO PARAMETRO UN DESTINO (STRING) Y UN FRAME. RECORRE CADA AEROLINEA EJECUTANDO EL METODO DE AEROLINEA buscarVueloPorDestino()
     # PARA ALMACENAR ESTOS VUELOS EN UNA LISTA Y EJECUTAR EL METODO mostrarTablaDeVuelos, DONDE SE LLENARA UN LABEL CON ESTA INFO.
@@ -304,7 +306,7 @@ class Admin(object):
             aerolinea = aerolineasDisponibles[i]
             vuelosPorDestino = aerolinea.buscarVueloPorDestino(aerolinea.vuelosDisponibles(aerolinea.getVuelos()), destino)
             if len(vuelosPorDestino) != 0:
-                label = Label(frame_operaciones)
+                label = Label(frame_operaciones, font=("Cascadia Code",9), bg="#bae7ec")
                 Admin.mostrarTablaDeVuelos(aerolinea, vuelosPorDestino, label)
                 vuelos.append(label)
                 nombreAerolineas.append(aerolinea.getNombre())
@@ -314,6 +316,7 @@ class Admin(object):
         lista_vuelos_nombres.append(nombreAerolineas)
 
         return lista_vuelos_nombres
+
 
     #--------------------------------------------------------------------------------------------------------------------------------------
     # ESTE METODO RECIBE COMO PARAMETRO UN DESTINO (STRING), UNA FECHA (STRING) Y UN FRAME. RECORRE CADA AEROLINEA EJECUTANDO EL METODO DE
@@ -336,7 +339,7 @@ class Admin(object):
             if len(vuelosPorDestino) != 0:
                 vuelosPorFecha = aerolinea.buscarVueloPorFecha(vuelosPorDestino, fecha)
                 if len(vuelosPorFecha) != 0:
-                    label = Label(frame_operaciones)
+                    label = Label(frame_operaciones, font=("Cascadia Code",9),bg="#bae7ec")
                     Admin.mostrarTablaDeVuelos(aerolinea, vuelosPorFecha, label)
                     vuelos.append(label)
                     nombreAerolineas.append(aerolinea.getNombre())
@@ -346,11 +349,15 @@ class Admin(object):
         lista_vuelos_nombres.append(nombreAerolineas)
 
         return lista_vuelos_nombres
+
+
     #--------------------------------------------------------------------------------------------------------------------------------------
     # RECIBE UN TIQUETE Y LOS DATOS DE UNA SILLA, PARA RETORNAR LA SILLA CON ESTAS CARACTERISTICAS
     @staticmethod
     def elegirSilla(tiquete,datos_silla):
-        clase =str( datos_silla[0])
+        from gestorAplicacion.adminVuelos.Tiquete import Tiquete
+        from gestorAplicacion.hangar.Aeronave import Aeronave
+        clase = str(datos_silla[0])
         ubicacion = str(datos_silla[1])
 
         if ubicacion.lower() == "pasillo":
@@ -401,7 +408,7 @@ class Admin(object):
         i = 0
         lista = []
         while i < len(aerolineas):
-            label = Label(frame_operaciones)
+            label = Label(frame_operaciones, bg="#bae7ec")
             aerolinea = aerolineas[i]
             Admin.printEncabezadoAerolinea(aerolineas[i],label)
             Admin.printVuelos(aerolinea.vuelosDisponibles(aerolinea.getVuelos()),label)
@@ -441,7 +448,7 @@ class Admin(object):
     def printVuelos(vuelos,label):
         j = 0
         while j < len(vuelos):
-            label["text"]+="\n"+"{0:>5} {1:>12} {2:>13} {3:>13} {4:>15} {5:>11} {6:>21}".format(vuelos[j].getID(), vuelos[j].getPrecio(), vuelos[j].getOrigen(), vuelos[j].getDestino(), vuelos[j].getFecha_de_salida(), vuelos[j].getHora_de_salida(), vuelos[j].getAeronave().getNombre())
+            label["text"]+="\n"+"{0:^4} {1:^13} {2:^12} {3:^14} {4:^12} {5:^22} {6:^12}".format(vuelos[j].getID(), vuelos[j].getPrecio(), vuelos[j].getOrigen(), vuelos[j].getDestino(), vuelos[j].getFecha_de_salida(), vuelos[j].getHora_de_salida(), vuelos[j].getAeronave().getNombre())
             label["text"]+="\n"
             j += 1
 

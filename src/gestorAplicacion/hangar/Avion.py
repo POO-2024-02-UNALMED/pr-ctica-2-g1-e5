@@ -1,24 +1,23 @@
 # CLASE AVION
 # AUTORES: JHONEYKER DELGADO, EMMANUEL VALENCIA, SIMON GUARIN, CAMILO MIRANDA Y JACOBO LEAL.
 import math
-from gestorAplicacion.hangar.Aeronave import Aeronave
-from gestorAplicacion.hangar.Silla import Silla
-from gestorAplicacion.hangar.Clase import Clase
-from gestorAplicacion.hangar.Ubicacion import Ubicacion
+from .Aeronave import Aeronave
+from .Silla import Silla
+from .Clase import Clase
+from .Ubicacion import Ubicacion
+from .Terminal import Terminal
+
 #from gestorAplicacion.adminVuelos import *
 
-class Avion(Aeronave):
+class Avion(Terminal,Aeronave):
     _NUM_SILLAS_ECONOMICAS = 24
     _NUM_SILLAS_EJECUTIVAS = 12
 
     # CONSTRUCTOR
     def __init__(self, nombre, aerolinea=None):
         super().__init__(nombre, aerolinea)
+        super().asignarParamatrosSilla(self,1)
 
-
-    def getNombre(self):
-        texto = super().getNombre() + "_A"
-        return texto
 
     @staticmethod
     def getNumSillasEconomicas():

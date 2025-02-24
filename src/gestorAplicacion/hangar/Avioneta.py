@@ -1,10 +1,10 @@
 # CLASE AVIONETA
 # AUTORES: JHONEYKER DELGADO, EMMANUEL VALENCIA, SIMON GUARIN, CAMILO MIRANDA Y JACOBO LEAL.
 import math
-from gestorAplicacion.hangar.Aeronave import Aeronave
-from gestorAplicacion.hangar.Silla import Silla
-from gestorAplicacion.hangar.Clase import Clase
-from gestorAplicacion.hangar.Ubicacion import Ubicacion
+from .Aeronave import Aeronave
+from .Silla import Silla
+from .Clase import Clase
+from .Ubicacion import Ubicacion
 
 class Avioneta(Aeronave):
 
@@ -13,6 +13,8 @@ class Avioneta(Aeronave):
 
     def __init__(self, nombre, aerolinea=None):
         super().__init__(nombre, aerolinea)
+        super().asignarParamatrosSilla(self,2)
+        
 
     @staticmethod
     def getNumSillasEconomicas():
