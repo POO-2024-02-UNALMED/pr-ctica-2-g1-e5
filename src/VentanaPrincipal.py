@@ -705,3 +705,209 @@ class VentanaSecundaria(Tk):
                 Admin.modificarSilla(numero,tiquete,silla)
                 messagebox.showinfo(title="Elegir",message = "Su silla ha sido asignada con exito.")
                 self.ventana_operaciones.pack_forget()
+                                self.ventana_operaciones = Frame(self.frame,bg="#bae7ec")
+                self.ventana_operaciones.pack()
+                label_tiquete = Label(self.ventana_operaciones,text=tiquete.__str__(),bg="#bae7ec")
+                label_tiquete.pack()
+
+            formulario.botonAceptar.config(command=envioDatos)
+
+            #Es llamada cuando se elige la clase de la silla, para activar el combobox que pregunta por la ubicacion de la misma
+
+            def claseElegida(a):
+                texto= formulario.entradas["Clase"].get()
+                if str(texto).lower() == "ejecutiva":
+                    formulario.entradas["Ubicacion"].grid_forget()
+                    formulario.entradas["Ubicacion"] = Combobox(formulario,values=["Pasillo","Ventana"])
+                    formulario.entradas["Ubicacion"].grid(row=2,column=1)
+                else:
+                    formulario.entradas["Ubicacion"].grid_forget()
+                    formulario.entradas["Ubicacion"] = Combobox(formulario,values=["Pasillo","Ventana","Central"])
+                    formulario.entradas["Ubicacion"].grid(row=2,column=1)
+
+            formulario.entradas["Clase"].grid_forget()
+            formulario.entradas["Clase"] =Combobox(formulario,values=["Ejecutiva","Economica"])
+            formulario.entradas["Clase"].grid(row = 1, column = 1)
+            formulario.entradas["Clase"].bind("<<ComboboxSelected>>",claseElegida)
+
+    #------------------------------------------------------------------------------------------------------------------------------------
+    # Permite listar los pasajeros de un vuelo al ingresar el ID del mismo, haciendo uso de la clase auxiliar
+
+    def listarPasajeros(self):
+        self.label_proceso.config(text = "Listar pasajeros")
+        self.label_descripcion.config(text = "Permite listar los pasajeros de un vuelo al ingresar su respectivo ID")
+
+
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones = Frame(self.frame, bg="#bae7ec")
+        self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=X)
+        fromulario = FieldFrame(self.ventana_operaciones,"info",["ID del vuelo"],"",["324"],None,["int"])
+        label = Label(self.ventana_operaciones,justify=LEFT,bg="#bae7ec")
+        label.pack()
+
+        # Es llamada cuando se hace click en el boton aceptar del formulario que pregunta por el ID, verifica que el ID existe y si es así,
+        # muestra en pantalla la lista de los pasajeros del vuelo con ese ID.
+
+        def tablaPasajeros():
+            label["text"]=""
+
+            try:
+                hay_excepcion = fromulario.aceptar()
+            except ExcepcionEnteroString as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.listarPasajeros()
+                return
+            except ExcepcionEnteroFloat as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.listarPasajeros()
+                return
+
+            if hay_excepcion:
+                self.listarPasajeros()
+                return
+
+            try:
+                Admin.listarPasajeros(fromulario.valor_entradas[0],label)
+            except ExcepcionEnteroString as awa:
+                messagebox.showerror(title = "Error", message = awa.mensaje_error_inicio)
+                self.listarPasajeros()
+                return
+            except ExcepcionEnteroFloat as awa:
+                messagebox.showerror(title="Error",message=awa.mensaje_error_inicio)
+                self.listarPasajeros()
+                return
+            except ExcepcionIdVuelo as awa:
+                messagebox.showwarning(title="Aviso",message=awa.mensaje_error_inicio)
+                self.listarPasajeros()
+                return
+
+        fromulario.botonAceptar.config(command=tablaPasajeros)
+
+    #-------------------------------------------------------------------------------------------------------------------------------------
+    # Despliega un formulario con los criterios necesarios para anadir un vuelo a una aerolinea, se capturan los datos ingresados y se
+    # agrega a la lista por medio de la clase auxiliar, comunicandole al usuario si la operacion fue realizada con exito
+
+    def agregarVuelo(self):
+        self.label_proceso.config(text = "Agregar un vuelo")
+        self.label_descripcion.config(text = "Permite agregar un vuelo para ser programado y ofrecido por una de nuestras aerolíneas")
+
+        criterios_vuelo = ["Aerolinea","_ID (3 cifras)","Precio","Origen","Destino","Distancia (km)","Fecha de salida (DD-MM-AAAA)","Hora de salida (24:00)","Aeronave","Nombre aeronave"]
+        valores_def = ["","","","","","","","","Avion",""]
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones = FieldFrame(self.frame,"Datos",criterios_vuelo,"Valores",valores_def,None,["string","int","int","string","string","int","string","string","string","string"])
+        self.ventana_operaciones.entradas["Aeronave"].grid_forget()
+        self.ventana_operaciones.entradas["Aeronave"] = Combobox(self.ventana_operaciones,values=["Avion","Avioneta"] )
+        self.ventana_operaciones.entradas["Aeronave"].grid(row = 9,column=1)
+
+        self.ventana_operaciones.entradas["Aerolinea"].grid_forget()
+        self.ventana_operaciones.entradas["Aerolinea"] = Combobox(self.ventana_operaciones,values=list(map(lambda x:x.getNombre(),Aerolinea.getAerolineas())))
+        self.ventana_operaciones.entradas["Aerolinea"].grid(row = 1,column=1)
+
+        # Es llamada cuando se presiona el botón aceptar del formulario que recoge los datos del nuevo vuelo, para pasarselos y crear un nuevo
+        # vuelo con la clase auxiliar
+
+        def crearVuelo():
+
+            try:
+                hay_excepcion =self.ventana_operaciones.aceptar()
+            except ExcepcionEnteroString as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                return
+            except ExcepcionEnteroFloat as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                return
+            except ExcepcionStringNumero as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                return
+
+            if hay_excepcion:
+                return
+
+            existe_vuelo = Admin.agregarNuevoVuelo(self.ventana_operaciones.valor_entradas)
+            if existe_vuelo:
+                messagebox.showinfo(title="Agregar Vuelo", message= "Ya existe un vuelo con el ID ingresado.")
+                return
+
+            mensaje = messagebox.showinfo(title = "Agregar Vuelo", message = "El vuelo se ha agregado a la aerolinea " + self.ventana_operaciones.valor_entradas[0] + " correctamente!")
+        self.ventana_operaciones.botonAceptar.config(command=crearVuelo)
+
+    #-----------------------------------------------------------------------------------------------------------------------------------
+    # Permite cancelar un vuelo al obtener del usuario el ID del vuelo que desea eliminar y pasandoselo a la clase auxiliar, comunicancole
+    # al usuario si la operacion fue realizada con exito o no
+
+    def cancelarVuelo(self):
+        self.label_proceso.config(text = "Cancelar un vuelo")
+        self.label_descripcion.config(text ="Puedes retirar un vuelo de la lista de vuelos disponibles, escribiendo el nombre del vuelo\n (Puede ver el ID de cada vuelo en opcion <Ver vuelos disponibles por Aerolineas>)")
+
+        criterios_cancelar_vuelo =["Nombre de Aerolinea","_ID"]
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones = FieldFrame(self.frame,"Info",criterios_cancelar_vuelo,"Valor",None,None,["string","int"])
+        self.ventana_operaciones.entradas["Nombre de Aerolinea"].grid_forget()
+        self.ventana_operaciones.entradas["Nombre de Aerolinea"] = Combobox(self.ventana_operaciones,values=list(map(lambda x:x.getNombre(),Aerolinea.getAerolineas())))
+        self.ventana_operaciones.entradas["Nombre de Aerolinea"].grid(row = 1,column=1)
+
+        # Es llamada cuando se presiona el botón aceptar del formulario que recoge el ID del vuelo a eliminar, para pasarselo a la clase auxiliar
+        # y que esta elimine el vuelo de la lista de vuelos
+
+        def eliminarVuelo():
+
+            try:
+                hay_excepcion =self.ventana_operaciones.aceptar()
+            except ExcepcionEnteroString as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.cancelarVuelo()
+                return
+            except ExcepcionEnteroFloat as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.cancelarVuelo()
+                return
+
+            if hay_excepcion:
+                self.cancelarVuelo()
+                return
+
+            iD = int(self.ventana_operaciones.valor_entradas[1])
+            vuelo_encontrado = Admin.cancelarVuelos(Aerolinea.buscarAerolineaPorNombre(self.ventana_operaciones.valor_entradas[0]),iD)
+
+            if vuelo_encontrado:
+                mensaje = messagebox.showinfo(title = "Cancelar Vuelo", message = "El vuelo se ha cancelado correctamente!")
+            else:
+                mensaje = messagebox.showinfo(title = "Cancelar Vuelo", message = "No existe un vuelo con ese ID.")
+
+        self.ventana_operaciones.botonAceptar.config(command=eliminarVuelo)
+
+    #--------------------------------------------------------------------------------------------------------------
+    # Elimina un avion y el vuelo asociado el mismo al obtener del usuario el nombre del avion y pasandoselo a la clase auxiliar
+    # Comunicandole al usuario si la operacion fue realizada con exito.
+
+    def retirarAvion(self):
+        self.label_proceso.config(text = "Retirar un avion")
+        self.label_descripcion.config(text = "Retira un avion que esté descompuesto y el vuelo asociado a este\n (Puede ver los nombres de las aeronaves en la opcion <Ver vuelos disponibles por Aerolineas>) ")
+
+        criterios_retirar_avion=["Nombre de Aerolinea","Nombre aeronave"]
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones = FieldFrame(self.frame,"Info",criterios_retirar_avion,"",None,None,["string","string"])
+        self.ventana_operaciones.entradas["Nombre de Aerolinea"].grid_forget()
+        self.ventana_operaciones.entradas["Nombre de Aerolinea"] = Combobox(self.ventana_operaciones,values=list(map(lambda x:x.getNombre(),Aerolinea.getAerolineas())))
+        self.ventana_operaciones.entradas["Nombre de Aerolinea"].grid(row = 1,column=1)
+
+
+        # Es llamada cuando se presiona el botón aceptar del formulario que recoge el nombre del avion a retirar, para pasarselo a la clase auxiliar
+        # y que esta retire la aeronave y elimine el vuelo asociado a este
+
+        def eliminarAeronave():
+
+            try:
+                hay_excepcion =self.ventana_operaciones.aceptar()
+            except ExcepcionStringNumero as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.retirarAvion()
+                return
+
+            if hay_excepcion:
+                self.retirarAvion()
+
+                return
+
+            aerolinea = self.ventana_operaciones.valor_entradas[0]
+            aerolinea = Aerolinea.buscarAerolineaPorNombre(aerolinea)
