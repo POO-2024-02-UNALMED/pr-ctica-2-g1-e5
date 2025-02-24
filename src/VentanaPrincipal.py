@@ -705,7 +705,7 @@ class VentanaSecundaria(Tk):
                 Admin.modificarSilla(numero,tiquete,silla)
                 messagebox.showinfo(title="Elegir",message = "Su silla ha sido asignada con exito.")
                 self.ventana_operaciones.pack_forget()
-                                self.ventana_operaciones = Frame(self.frame,bg="#bae7ec")
+                self.ventana_operaciones = Frame(self.frame,bg="#bae7ec")
                 self.ventana_operaciones.pack()
                 label_tiquete = Label(self.ventana_operaciones,text=tiquete.__str__(),bg="#bae7ec")
                 label_tiquete.pack()
@@ -911,3 +911,209 @@ class VentanaSecundaria(Tk):
 
             aerolinea = self.ventana_operaciones.valor_entradas[0]
             aerolinea = Aerolinea.buscarAerolineaPorNombre(aerolinea)
+            aeronave_encontrada = Admin.retirarAvion(aerolinea,self.ventana_operaciones.valor_entradas[1])
+
+            if aeronave_encontrada:
+                mensaje = messagebox.showinfo(title = "Retirar Avion", message = "El avion ha sido retirado.")
+            else:
+                mensaje = messagebox.showinfo(title = "Retirar Avion", message = "No tenemos un avion con ese nombre.")
+
+        self.ventana_operaciones.botonAceptar.config(command=eliminarAeronave)
+ 
+    #-----------------------------------------------------------------------------------------------------------------------------------
+    # Despliega un formulario con los criterios necesarios para anadir un alojamiento a la lista, se capturan los datos ingresados y se
+    # agrega a la lista por medio de la clase auxiliar, comunicandole al usuario si la operacion fue realizada con exito
+
+    def agregarAlojamiento(self):
+        self.label_proceso.config(text = "Agregar un alojamiento")
+        self.label_descripcion.config(text = "Permite agregar un alojamiento a la lista de alojamientos asociados")
+
+        criterios_alojamiento =["Nombre Alojamiento","Locacion","Precio por dia","Numero de estrellas (1-5)"]
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones = FieldFrame(self.frame,"Datos",criterios_alojamiento,"VALORES",None,None,["string","string","int","int"])
+
+        # Es llamada cuando se presiona el botón aceptar del formulario que recoge los datos del nuevo alojamiento, para pasarselos y crear un nuevo
+        # alojamiento con la clase auxiliar
+
+        def crearAlojamiento():
+
+            try:
+                hay_excepcion =self.ventana_operaciones.aceptar()
+                
+            except ExcepcionEnteroString as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.agregarAlojamiento()
+                return
+            
+            except ExcepcionEnteroFloat as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.agregarAlojamiento()
+                return
+            
+            except ExcepcionStringNumero as owo:
+                messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                self.agregarAlojamiento()
+                return
+
+            if hay_excepcion:
+                self.agregarAlojamiento()
+                return
+
+            Admin.nuevoAlojamiento(self.ventana_operaciones.valor_entradas)
+            mensaje = messagebox.showinfo(title = "Agregar alojamiento", message = "El alojamiento se ha agregado a nuestra lista correctamente!")
+
+        self.ventana_operaciones.botonAceptar.config(command=crearAlojamiento)
+
+    #-----------------------------------------------------------------------------------------------------------------------------------
+    # Elimina un alojamiento de la lista de alojamientos al hacer clic en uno de ellos al interior del combobox
+    # Obtenemos el nombre del alojamiento que se desea eliminar, y con la clase auxiliar lo eliminamos de la lista,
+    # Comunicandole al usuario si la operacion fue realizada con exito.
+
+    def eliminarAlojamiento(self):
+        self.label_proceso.config(text = "Eliminar un alojamiento")
+        self.label_descripcion.config(text = "Permite eliminar un alojamiento de la lista de alojamientos asociados, seleccionando el nombre \n del alojamiento que se desea retirar")
+
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones = Frame(self.frame, bg="#bae7ec")
+
+        self.ventana_operaciones.pack(ipadx = 3, ipady =3, padx = 5, pady= 5,fill=X)
+        lista_alojamientos= Admin.obtenerAlojamientos()
+
+        # Es llamada cuando se selecciona un alojamiento de los alojamientos disponibles, se recoge el nombre del alojamiento y con ayuda
+        # de la clase auxiliar, es eliminada de la lista de alojamientos
+
+        def alojamientoSeleccionado(event):
+            texto = combobox.get()
+            nombre_alojamiento = texto.split("---")[0]
+            alojamiento_encontrado = Admin.retirarAlojamiento(nombre_alojamiento)
+            if alojamiento_encontrado:
+                mensaje = messagebox.showinfo(title = "Eliminar Alojamiento", message = "El alojamiento se ha eliminado de nuestra lista correctamente!")
+                self.eliminarAlojamiento()
+            else:
+                mensaje = messagebox.showinfo(title = "Eliminar Alojamiento", message = "El alojamiento ya ha sido eliminado.")
+                self.eliminarAlojamiento()
+        combobox = Combobox(self.ventana_operaciones,values=lista_alojamientos,width=50)
+        combobox.pack()
+        combobox.bind("<<ComboboxSelected>>",alojamientoSeleccionado)
+
+    def agregarAerolinea(self):
+        self.label_proceso.config(text = "Agregar aerolínea")
+        self.label_descripcion.config(text = "Aquí puede agregar aerolíneas a nuestro sistema",)
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones= Frame(self.frame,relief="groove",bd=2, bg="#bae7ec")
+        self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=X)
+        self.z=Label(self.ventana_operaciones, text="Estas son las aerolineas creadas en nuestro sistema",font=("Cascadia Code", 12, "bold"), bg="#bae7ec").pack()
+        for i in Aerolinea.getAerolineas():
+            self.la= Label(self.ventana_operaciones, text=i.getNombre(), bg="#bae7ec")
+            self.la.pack()
+        self.f=Label(self.ventana_operaciones, text="Ingrese el nombre de su Aerolinea",bg="#bae7ec").pack()
+        self.en=Entry(self.ventana_operaciones, bg="#daf4fe")
+        self.en.pack()
+        
+        def crearAerolinea():
+            if Aerolinea.buscarAerolineaPorNombre(self.en.get())!=None:
+                mensaje = messagebox.showinfo(title = "Agregar Aerolinea", message="Ya existe una aerolinea con este nombre")
+                self.agregarAerolinea()
+            else:
+                Aerolinea(self.en.get())
+                self.l = Label(self.ventana_operaciones, text="Estas son las aerolineas existentes en nuestro sistema", font = ("Cascadia Code", 12,"bold")).pack()
+                self.agregarAerolinea()
+                
+        self.aceptar = Button(self.ventana_operaciones, text="Aceptar", command=crearAerolinea, bg="#9ccce0", activebackground="#94c0d3", width= 15, height= 1).pack(side="left", padx=100,  pady=50)
+        self.borrar = Button(self.ventana_operaciones, command= lambda: self.en.delete(0,"end"),text="Borrar", bg="#9ccce0", activebackground="#94c0d3", width= 15, height= 1).pack(side="right", padx=100, pady=50)
+    def eliminarAerolinea(self):
+        self.label_proceso.config(text="Eliminar una Aerolinea")
+        self.label_descripcion.config(text="Aqui podra eliminar una aerolinea con sus vuelos de nuestro sistema")
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones= Frame(self.frame,relief="groove",bd=2, bg="#bae7ec")
+        self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=X)
+        self.l = Label(self.ventana_operaciones, text="Estas son las aerolineas existentes en nuestro sistema",font=("Cascadia Code", 12,"bold"),bg="#bae7ec").pack()
+        for i in Aerolinea.getAerolineas():
+            self.la= Label(self.ventana_operaciones, text=i.getNombre(),bg="#bae7ec")
+            self.la.pack()
+        self.f=Label(self.ventana_operaciones, text="Ingrese el nombre de la Aerolinea que desea borrar",bg="#bae7ec").pack()
+        self.en=Entry(self.ventana_operaciones, bg="#daf4fe")
+        self.en.pack()
+        def cerrarAerolinea():
+            if Aerolinea.buscarAerolineaPorNombre(self.en.get())==None:
+                mensaje = messagebox.showinfo(title = "Eliminar Aerolinea", message="No existe ninguna aerolinea con este nombre")
+                self.eliminarAerolinea()
+            else:
+                for j in Aerolinea.getAerolineas():
+                    if j.getNombre().lower()==self.en.get().lower():
+                        Aerolinea.getAerolineas().remove(j) 
+                self.eliminarAerolinea()    
+
+        self.aceptar = Button(self.ventana_operaciones, text="Aceptar", command=cerrarAerolinea, bg="#9ccce0", activebackground="#94c0d3", width= 15, height= 1).pack(side="left", padx=100,  pady=50)
+        self.borrar = Button(self.ventana_operaciones, command= lambda: self.en.delete(0,"end"), text="Borrar", bg="#9ccce0", activebackground="#94c0d3", width= 15, height= 1).pack(side="right", padx=100, pady=50)
+    def agAerolinea(self):
+        self.label_proceso.config(text = "Agregar aerolínea con vuelos")
+        self.label_descripcion.config(text = "Aquí puede agregar aerolíneas a nuestro sistema",)
+        self.ventana_operaciones.pack_forget()
+        self.ventana_operaciones= Frame(self.frame,relief="groove",bd=2, bg="#bae7ec")
+        self.ventana_operaciones.pack(ipadx = 2, ipady =2, padx = 2, pady= 2,fill=X)
+        self.z=Label(self.ventana_operaciones, text="Estas son las aerolineas creadas en nuestro sistema",font=("Cascadia Code", 12, "bold"), bg="#bae7ec").pack()
+        for i in Aerolinea.getAerolineas():
+            self.la= Label(self.ventana_operaciones, text=i.getNombre(), bg="#bae7ec")
+            self.la.pack()
+        self.f=Label(self.ventana_operaciones, text="Ingrese el nombre de su Aerolinea", bg="#bae7ec").pack()
+        self.en=Entry(self.ventana_operaciones,bg="#daf4fe")
+        self.en.pack()
+        def crearAerolinea():
+            if Aerolinea.buscarAerolineaPorNombre(self.en.get())!=None:
+                    mensaje = messagebox.showinfo(title = "Agregar Aerolinea", message="Ya existe una aerolinea con este nombre")
+                    self.agAerolinea()
+            else:
+                Aerolinea(self.en.get())                
+                def agregarVuelo():
+                    self.label_proceso.config(text = "Agregar un vuelo")
+                    self.label_descripcion.config(text = "Permite agregar un vuelo para ser programado y ofrecido por una de nuestras aerolíneas")
+                    criterios_vuelo = ["Aerolinea","_ID (3 cifras)","Precio","Origen","Destino","Distancia (km)","Fecha de salida (DD-MM-AAAA)","Hora de salida (24:00)","Aeronave","Nombre aeronave"]
+                    valores_def = ["","","","","","","","","Avion",""]
+                    self.ventana_operaciones.pack_forget()
+                    self.ventana_operaciones = FieldFrame(self.frame,"Datos",criterios_vuelo,"Valores",valores_def,None,["string","int","int","string","string","int","string","string","string","string"])
+                    self.ventana_operaciones.entradas["Aeronave"].grid_forget()
+                    self.ventana_operaciones.entradas["Aeronave"] = Combobox(self.ventana_operaciones,values=["Avion","Avioneta"] )
+                    self.ventana_operaciones.entradas["Aeronave"].grid(row = 9,column=1)
+
+                    self.ventana_operaciones.entradas["Aerolinea"].grid_forget()
+                    x=StringVar(value=self.en.get())
+                    self.ventana_operaciones.entradas["Aerolinea"] = Entry(self.ventana_operaciones,textvariable=x, state="disabled")
+                    self.ventana_operaciones.entradas["Aerolinea"].grid(row = 1,column=1, ipadx=10, padx=30, pady = 2)
+
+                    # Es llamada cuando se presiona el botón aceptar del formulario que recoge los datos del nuevo vuelo, para pasarselos y crear un nuevo
+                    # vuelo con la clase auxiliar
+
+                    def crearVuelo():
+
+                        try:
+                            hay_excepcion =self.ventana_operaciones.aceptar()
+                        except ExcepcionEnteroString as owo:
+                            messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                            return
+                        except ExcepcionEnteroFloat as owo:
+                            messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                            return
+                        except ExcepcionStringNumero as owo:
+                            messagebox.showerror(title="Error",message=owo.mensaje_error_inicio)
+                            return
+                        if hay_excepcion:
+                            return
+
+                        existe_vuelo = Admin.agregarNuevoVuelo(self.ventana_operaciones.valor_entradas)
+                        if existe_vuelo:
+                            messagebox.showinfo(title="Agregar Vuelo", message= "Ya existe un vuelo con el ID ingresado.")
+                            return
+
+                        mensaje = messagebox.showinfo(title = "Agregar Vuelo", message = "El vuelo se ha agregado a la aerolinea " + self.ventana_operaciones.valor_entradas[0] + " correctamente!")
+
+                    self.ventana_operaciones.botonAceptar.config(command=crearVuelo)
+                agregarVuelo()  
+        self.aceptar = Button(self.ventana_operaciones, text="Aceptar", command=crearAerolinea, bg="#9ccce0", activebackground="#94c0d3",width= 15, height= 1).pack(side="left", padx=100,  pady=50)
+        self.borrar = Button(self.ventana_operaciones, command= lambda: self.en.delete(0,"end"), text="Borrar", bg="#9ccce0", activebackground="#94c0d3", width= 15, height= 1).pack(side="right", padx=100, pady=50)
+
+
+    #-------------------------------------------------------------------------------------------------------------------------------------
+    # Muestra un Message Box con los nombres de los autores de la aplicación.
+    def ayuda(self):
+        ayudaPopUp = messagebox.showinfo(title = "Desarrolladores", message ="Jhoneyker Delgado Urbina\n Emmanuel Valencia Lopera\n Simon Guarin Cortes \n Jesus Camilo Miranda Aguirre\n Andres Jacobo Leal Aguirre")
