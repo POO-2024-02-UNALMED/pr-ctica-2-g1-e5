@@ -49,3 +49,45 @@ class VentanaSecundaria(Tk):
         self.menuArchivo = Menu(self.menubar,bg="#f0f0f0", fg="black", activebackground="#2171ea", activeforeground="#f9f9f9")
         self.menuArchivo.add_command(label = "Aplicacion", command = self.descripcionApp)
         self.menuArchivo.add_command(label = "Salir", command = self.salirVentana)
+
+        self.menuProcesos = Menu(self.menubar,bg="#f0f0f0", fg="black", activebackground="#2171ea", activeforeground="#f9f9f9")
+        self.menuProcesos.add_command(label = "Ver vuelos disponibles por Aerolineas",command= self.mostrarVuelosPorAerolineas)
+        self.menuProcesos.add_command(label = "Comprar tiquete para un vuelo por destino y fecha", command = self.generarTiquete)
+        self.menuProcesos.add_command(label = "Agregar alojamiento en el destino del vuelo", command = self.agregarAlojamientoTiquete )
+        self.menuProcesos.add_command(label = "Modificar tiquete comprado", command = self.modificarTiquete)
+
+        self.menuAdmin = Menu(self.menuProcesos, bg="#f0f0f0", fg="black", activebackground="#2171ea", activeforeground="#f9f9f9", tearoff=0)
+        self.menuProcesos.add_cascade(menu = self.menuAdmin,label = "Ver opciones de administrador")
+        self.menuAdmin.add_command(label= "Listar pasajeros",command=self.listarPasajeros)
+        self.menuAdmin.add_command(label= "Agregar vuelo",command=self.agregarVuelo)
+        self.menuAdmin.add_command(label= "Cancelar vuelo",command=self.cancelarVuelo)
+        self.menuAdmin.add_command(label= "Retirar avion",command=self.retirarAvion)
+        self.menuAdmin.add_command(label= "Agregar alojamiento",command=self.agregarAlojamiento)
+        self.menuAdmin.add_command(label= "Eliminar Alojamiento",command=self.eliminarAlojamiento)
+        self.menuAdmin.add_command(label= "Agregar Aerolinea",command=self.agregarAerolinea)
+        self.menuAdmin.add_command(label= "Eliminar Aerolinea",command=self.eliminarAerolinea)
+        self.menuAdmin.add_command(label= "Agregar Aerolinea con vuelos",command=self.agAerolinea)
+
+        self.menuAyuda = Menu(self.menubar)
+        self.menuAyuda.add_command(label = "Acerca de", command = self.ayuda)
+
+        self.menubar.add_cascade(label = "Archivo", menu = self.menuArchivo)
+        self.menubar.add_cascade(label = "Procesos y Consultas", menu = self.menuProcesos)
+        self.menubar.add_cascade(label = "Ayuda", menu = self.menuAyuda)
+        self["menu"] = self.menubar
+        #FIN ZONAS DE MENUS
+
+
+        #ZONA DE LABELS
+        self.label_proceso = Label(self.frame_proceso,text= "TURBINA TOURS AND RESORT", font = ("Cascadia Code", 17,"bold"),height=2,bg="#137a9b")
+        self.label_proceso.pack(ipadx = 2, ipady =2, padx = 5, pady= 5)
+
+        self.label_descripcion = Label(self.frame_descripcion, text = "Sistema para la venta de tiquetes y alojamientos, y modificación por parte de un administrador", font = ("Cascadia Code", 9), bg="#0979b0")
+        self.label_descripcion.pack(ipadx = 2, ipady = 2, padx = 5, pady= 5)
+
+        self.labelTexto = Label(self.ventana_operaciones, text = "Puedes hacerlo con las acciones dispuestas en el menu <Procesos y consultas>", font = ("Cascadia Code", 10),bg="#bae7ec")
+        self.labelInicio = Label(self.ventana_operaciones)
+        self.labelInicio.place(relheight=0.55, relwidth=0.5,relx=0.25, rely=0.25)
+        self.labelTexto.place(relheight=0.2, relwidth=0.8, relx=0.1)
+        self.ventana_operaciones.after(100, self.cargar_imagen)
+        self.labelInicio.bind("<Configure>", self.cambioImagen)
