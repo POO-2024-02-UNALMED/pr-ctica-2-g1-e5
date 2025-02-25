@@ -7,7 +7,7 @@ class Aeronave(ABC):
 
     # CONTRUCTOR
     def __init__(self, nombre, aerolinea=0):
-        self.GASTO_GASOLINA = 10000
+        self.Gasto_gasolina = 10000
         self._descompuesto = False
         self._SILLAS_ECONOMICAS = []
         self._SILLAS_EJECUTIVAS = []
