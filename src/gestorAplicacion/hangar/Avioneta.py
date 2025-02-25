@@ -47,5 +47,5 @@ class Avioneta(Aeronave):
     #
 
     def Calcular_Consumo_Gasolina(self, distancia_en_km):
-        consumido = self.getGastoGasolina() * distancia_en_km
+        consumido = Aeronave.Gasto_gasolina * distancia_en_km
         return consumido

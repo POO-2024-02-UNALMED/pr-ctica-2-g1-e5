@@ -33,5 +33,5 @@ class Avion(Terminal,Aeronave):
     #	Y RETONARNA EL COSTO TOTAL DE GASOLINA PARA RECORRER EL TRAYECTO
     def Calcular_Consumo_Gasolina(self, distancia_en_km):
         consumido = None
-        consumido = self.getGastoGasolina() * distancia_en_km
+        consumido = Aeronave.Gasto_gasolina * distancia_en_km
         return consumido
